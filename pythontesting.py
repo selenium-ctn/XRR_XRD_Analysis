@@ -1,4 +1,8 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import scipy.signal
+from scipy.interpolate import interp1d
+from scipy.ndimage import median_filter
 
 zscan = open('Smartlab data/ZscanSTBXRR_0014_Scan2020Jan24-124745.dat', 'r')
 xrr_spec = open('Smartlab data/spec2Pt111_Al2O3_006_1.dat', 'r')
@@ -45,12 +49,47 @@ xrr_bkg.close()
 bkg_theta = np.array(bkg_theta)
 bkg_cps = np.array(bkg_cps)        
 
-#print(zscan_z)
-#print(zscan_cps)
-print(spec_theta)
-print(spec_cps)
-print(bkg_theta)
-print(bkg_cps)
+print(zscan_z)
+print(zscan_cps)
+#print(spec_theta)
+#print(spec_cps)
+#print(bkg_theta)
+#print(bkg_cps)
+
+#my_pwlf = pwlf.PiecewiseLinFit(zscan_z, zscan_cps)
+#breaks = my_pwlf.fit(3)
+#print(breaks)
+
+first_deriv = np.gradient(zscan_cps, zscan_z)
+
+test = scipy.signal.savgol_filter(zscan_cps, 101, polyorder=7, deriv=0)
+testgrad = np.gradient(test, zscan_z) 
+
+tst = scipy.ndimage.median_filter(zscan_cps, size=5)
+tstg = np.gradient(tst, zscan_z)
+
+tstgg = scipy.ndimage.median_filter(tstg, size=5)
+tstg2 = scipy.signal.savgol_filter(tstg, 101, polyorder=7, deriv=0)
+
+tstggg = scipy.ndimage.median_filter(first_deriv, size=5)
+z2 = np.linspace(zscan_z[0], zscan_z[zscan_z.size - 1], zscan_z.size)
+plt.plot(zscan_z, zscan_cps)
+plt.plot(zscan_z, tst)
+plt.plot(zscan_z, test)
+plt.figure()
+#plt.plot(zscan_z, ftwo(x2))
+#plt.figure()
+plt.plot(zscan_z, first_deriv)
+plt.plot(zscan_z, tstg)
+plt.plot(zscan_z, tstg2)
+plt.plot(zscan_z, testgrad)
+#plt.plot(zscan_z, tstgg)
+#plt.plot(zscan_z, tstggg)
+plt.figure()
+plt.plot(zscan_z, np.gradient(tstg2, zscan_z))
+#plt.figure()
+plt.show()
+
 
 
 
