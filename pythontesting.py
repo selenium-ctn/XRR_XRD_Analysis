@@ -12,8 +12,8 @@ xrr_bkg = open('Smartlab data/bkg2Pt111_Al2O3_006.dat', 'r')
 # not sure if this is the right set of files lol 
 
 #zscan = open('Smartlab data/Zscan_0007_Scan2020Jan23-191605.dat', 'r')
-zscan = open('Zscan_1.DAT', 'r')
-#zscan = open('Zscan_2.DAT', 'r')
+#zscan = open('Zscan_1.DAT', 'r')
+zscan = open('Zscan_2.DAT', 'r')
 #zscan = open('Zscan_XRR_0009_Scan2020Feb07-220747.DAT', 'r')
 
 # read files into lists, turn lists into numpy matrices
@@ -111,14 +111,50 @@ z2 = np.linspace(zscan_z[0], zscan_z[zscan_z.size - 1], zscan_z.size)
 d1_fun = CubicSmoothingSpline(zscan_z, first_deriv, smooth=0.99995).spline
 d2 = np.gradient(d1_fun(z2), z2)
 
+#filter_arr = d1_fun(z2) < 0 
+#reduced_d1 = d1_fun(z2)[filter_arr]
+#reduced_z2 = z2[filter_arr]
+
+d1 = d1_fun(z2)
+
+#edge case never gets above 0 
+min_pos = d1.argmin()
+curr_val = d1[min_pos]
+curr_index = min_pos
+while curr_val < 0:
+    curr_index = curr_index + 1
+    curr_val = d1[curr_index]
+    print(curr_val)
+
+print("done")    
+
+end_ind = curr_index 
+
+curr_val = d1[min_pos]
+curr_index = min_pos
+while curr_val < 0:
+    curr_index = curr_index - 1
+    curr_val = d1[curr_index]
+    print(curr_val)
+    
+
+start_ind = curr_index 
+
+reduced_d1 = d1[start_ind:end_ind]
+reduced_z2 = z2[start_ind:end_ind]
+
+
 plt.plot(zscan_z, zscan_cps)
 plt.figure()
 plt.plot(zscan_z, first_deriv)
 plt.plot(z2, d1_fun(z2))
+plt.plot(reduced_z2, reduced_d1)
 plt.figure()
 plt.plot(z2, d2) 
+plt.plot(reduced_z2, np.gradient(reduced_d1, reduced_z2))
 plt.figure()
 plt.plot(z2, np.gradient(d2, z2)) 
+plt.plot(reduced_z2, np.gradient(np.gradient(reduced_d1, reduced_z2), reduced_z2))
 
 print(max(d2))
 print(min(d2))
