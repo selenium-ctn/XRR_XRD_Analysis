@@ -56,8 +56,8 @@ xrr_bkg.close()
 bkg_theta = np.array(bkg_theta)
 bkg_cps = np.array(bkg_cps)        
 
-print(zscan_z)
-print(zscan_cps)
+#print(zscan_z)
+#print(zscan_cps)
 #print(spec_theta)
 #print(spec_cps)
 #print(bkg_theta)
@@ -67,7 +67,14 @@ effective_beam_height = zscan_fun.eff_beam_height(zscan_z, zscan_cps)
 print(effective_beam_height)
 
 plt.plot(zscan_z, zscan_cps)
+plt.xlabel("z (mm)")
+plt.ylabel("cps")
+plt.title("zscan")
 plt.show()
+
+#still need: beautify graph, STB intensity, test effective beam height with
+#multiple files, make sure edge cases are covered, tuple never has more 
+#than one value, etc 
 
 
 

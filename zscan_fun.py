@@ -6,6 +6,8 @@ def eff_beam_height(z, cps):
     """Determines the effective beam height from XRR zscan data.
 
     z = numpy array of z data, cps = numpy array of cps data.
+    Returns tuple: z_1, z_2, effective beam height. z_1 and z_2
+    are the z values that the linear fitted drop is between 
     """
     first_deriv = np.gradient(cps, z)
     linspace_z = np.linspace(z[0], z[z.size - 1], z.size)
@@ -53,5 +55,24 @@ def eff_beam_height(z, cps):
     z_2 = reduced_z[min_pos_2_d3]
 
     print(z_1, z_2)
-    return abs(z_1 - z_2)
+    return z_1, z_2, abs(z_1 - z_2)
         
+def STB_intensity(z_arr, cps_arr, z_end_val):
+    """Determines the straight to beam intensity from XRR zscan data.
+
+    cps_arr = numpy array of cps data, z_end_val = the last 
+    value of the high plateau
+    """
+
+    #should drop first values?? 
+
+    curr_pos = z_arr.len() - 1
+    curr_val = z_arr[curr_pos]
+    while curr_val > z_end_val: 
+        curr_val = z_arr[curr_pos]
+        curr_pos = curr_pos - 1
+    
+    end_pos = curr_pos + 1
+    reduced_cps = cps_arr[0:end_pos]
+
+    return np.mean(reduced_cps)
