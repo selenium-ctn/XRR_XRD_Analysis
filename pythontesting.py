@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 from csaps import CubicSmoothingSpline
 from scipy.signal import argrelextrema 
 import zscan_fun 
+from math import pi, sin, log10
+
+user_lambda = input("Enter lambda ")
+B = input("Enter sample length ")
 
 #zscan = open('Smartlab data/ZscanSTBXRR_0014_Scan2020Jan24-124745.dat', 'r')
 xrr_spec = open('Smartlab data/spec2Pt111_Al2O3_006_1.dat', 'r')
@@ -63,7 +67,8 @@ bkg_cps = np.array(bkg_cps)
 #print(bkg_theta)
 #print(bkg_cps)
 
-effective_beam_height = zscan_fun.eff_beam_height(zscan_z, zscan_cps)
+z_val_1, z_val_2, effective_beam_height = zscan_fun.eff_beam_height(zscan_z, zscan_cps)
+stb_inten = zscan_fun.STB_intensity(zscan_z, zscan_cps, min(z_val_1, z_val_2))
 print(effective_beam_height)
 
 plt.plot(zscan_z, zscan_cps)
@@ -76,6 +81,25 @@ plt.show()
 #multiple files, make sure edge cases are covered, tuple never has more 
 #than one value, etc 
 
+#Specular & background 
 
+spec_q = 4 * pi * sin(spec_theta / 2) / user_lambda
+bkg_q = 4 * pi * sin(bkg_theta / 2) / user_lambda
+diff_q = spec_q - bkg_q
+diff_cps = spec_cps - bkg_cps
 
+#Geometrical correction
+gc_cps = (effective_beam_height / ( B * sin(spec_theta /  2))) * diff_cps
 
+plt.plot(diff_q, log10(diff_cps))
+plt.plot(diff_q, log10(gc_cps))
+
+highest_cps = np.maximum(diff_cps, gc_cps)
+norm_inten = highest_cps / stb_inten
+
+plt.plot(diff_q, log10(norm_inten))
+
+#naming convention 
+#f = open("insert_name_here", "w")
+#for 
+#ya anyway write to file
