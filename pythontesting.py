@@ -14,6 +14,7 @@ B = 10
 #xrr_spec = open('Smartlab data/spec2Pt111_Al2O3_006_1.dat', 'r')
 #xrr_bkg = open('Smartlab data/bkg2Pt111_Al2O3_006.dat', 'r')
 # not sure if this is the right set of files lol 
+# it's not hehe
 
 zscan = open('ATXG data/Zscan.dat', 'r')
 xrr_spec = open('ATXG data/spec_XRR.dat', 'r')
@@ -66,13 +67,6 @@ xrr_bkg.close()
 bkg_theta = np.array(bkg_theta)
 bkg_cps = np.array(bkg_cps)        
 
-#print(zscan_z)
-#print(zscan_cps)
-#print(spec_theta)
-#print(spec_cps)
-#print(bkg_theta)
-#print(bkg_cps)
-
 z_val_1, z_val_2, effective_beam_height = zscan_fun.eff_beam_height(zscan_z, zscan_cps)
 stb_inten = zscan_fun.STB_intensity(zscan_z, zscan_cps, min(z_val_1, z_val_2))
 print(effective_beam_height)
@@ -83,7 +77,7 @@ plt.xlabel("z (mm)")
 plt.ylabel("cps")
 plt.title("zscan")
 
-#still need: beautify graph, STB intensity, test effective beam height with
+#still need: beautify graph, test effective beam height with
 #multiple files, make sure edge cases are covered, tuple never has more 
 #than one value, etc 
 
@@ -91,7 +85,6 @@ plt.title("zscan")
 
 spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / user_lambda
 bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / user_lambda
-
 diff_cps = spec_cps - bkg_cps
 
 #Geometrical correction
