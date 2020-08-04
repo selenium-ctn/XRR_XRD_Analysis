@@ -66,7 +66,7 @@ def STB_intensity(z_arr, cps_arr, z_end_val):
 
     #should drop first values?? 
 
-    curr_pos = z_arr.len() - 1
+    curr_pos = z_arr.size - 1
     curr_val = z_arr[curr_pos]
     while curr_val > z_end_val: 
         curr_val = z_arr[curr_pos]
