@@ -4,6 +4,7 @@ from csaps import CubicSmoothingSpline
 from scipy.signal import argrelextrema 
 import zscan_fun 
 from math import pi
+import re
 
 #user_lambda = input("Enter lambda ")
 #B = input("Enter sample length ")
@@ -28,10 +29,14 @@ xrr_bkg = open('ATXG data/BKG_XRR.dat', 'r')
 # read files into lists, turn lists into numpy matrices
 # possibly change so that symbols to ignore are more general? / ask Carlos
 # if there are any others? 
+
+exclude = re.compile(r"[\d-]")
+
 zscan_z  = []
 zscan_cps = []
 for line in zscan:
-    if line[0] != "*" and line[0] != "#" and line[0] != ";":
+    #if line[0] != "*" and line[0] != "#" and line[0] != ";":
+    if exclude.match(line):
         z, cps = line.split(' ')
         cps = cps.strip('\n')
         zscan_z.append(float(z))
@@ -40,11 +45,14 @@ for line in zscan:
 zscan.close()
 zscan_z = np.array(zscan_z)
 zscan_cps = np.array(zscan_cps)
+print(zscan_z)
+print(zscan_cps)
 
 spec_theta  = []
 spec_cps = []
 for line in xrr_spec:
-    if line[0] != "*" and line[0] != "#" and line[0] != ";":
+    #if line[0] != "*" and line[0] != "#" and line[0] != ";":
+    if exclude.match(line):
         theta, cps = line.split(' ')
         cps = cps.strip('\n')
         spec_theta.append(float(theta))
@@ -57,7 +65,8 @@ spec_cps = np.array(spec_cps)
 bkg_theta  = []
 bkg_cps = []
 for line in xrr_bkg:
-    if line[0] != "*" and line[0] != "#" and line[0] != ";":
+    #if line[0] != "*" and line[0] != "#" and line[0] != ";":
+    if exclude.match(line):
         theta, cps = line.split(' ')
         cps = cps.strip('\n')
         bkg_theta.append(float(theta))
