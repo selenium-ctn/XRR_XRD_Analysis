@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from csaps import CubicSmoothingSpline
 from scipy.signal import argrelextrema 
-import zscan_fun 
 from math import pi
 import re
+import zscan_fun 
+import file_reading
 
 #user_lambda = input("Enter lambda ")
 #B = input("Enter sample length ")
@@ -27,60 +28,17 @@ xrr_bkg = open('ATXG data/BKG_XRR.dat', 'r')
 #zscan = open('Zscan_XRR_0009_Scan2020Feb07-220747.DAT', 'r')
 
 # read files into lists, turn lists into numpy matrices
-# possibly change so that symbols to ignore are more general? / ask Carlos
-# if there are any others? 
+zscan_z, zscan_cps = file_reading.pull_data(zscan)
+spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
+bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)      
 
-exclude = re.compile(r"[\d-]")
-
-zscan_z  = []
-zscan_cps = []
-for line in zscan:
-    #if line[0] != "*" and line[0] != "#" and line[0] != ";":
-    if exclude.match(line):
-        z, cps = line.split(' ')
-        cps = cps.strip('\n')
-        zscan_z.append(float(z))
-        zscan_cps.append(float(cps))
-
-zscan.close()
-zscan_z = np.array(zscan_z)
-zscan_cps = np.array(zscan_cps)
-print(zscan_z)
-print(zscan_cps)
-
-spec_theta  = []
-spec_cps = []
-for line in xrr_spec:
-    #if line[0] != "*" and line[0] != "#" and line[0] != ";":
-    if exclude.match(line):
-        theta, cps = line.split(' ')
-        cps = cps.strip('\n')
-        spec_theta.append(float(theta))
-        spec_cps.append(float(cps))
-
-xrr_spec.close()
-spec_theta = np.array(spec_theta)
-spec_cps = np.array(spec_cps)
-
-bkg_theta  = []
-bkg_cps = []
-for line in xrr_bkg:
-    #if line[0] != "*" and line[0] != "#" and line[0] != ";":
-    if exclude.match(line):
-        theta, cps = line.split(' ')
-        cps = cps.strip('\n')
-        bkg_theta.append(float(theta))
-        bkg_cps.append(float(cps))
-
-xrr_bkg.close()
-bkg_theta = np.array(bkg_theta)
-bkg_cps = np.array(bkg_cps)        
-
+#get the effective beam height, z locations where linear drop starts and ends, STB intensity 
 z_val_1, z_val_2, effective_beam_height = zscan_fun.eff_beam_height(zscan_z, zscan_cps)
 stb_inten = zscan_fun.STB_intensity(zscan_z, zscan_cps, min(z_val_1, z_val_2))
 print(effective_beam_height)
 print(stb_inten)
 
+#plot z vs cps 
 plt.plot(zscan_z, zscan_cps)
 plt.xlabel("z (mm)")
 plt.ylabel("cps")
@@ -91,7 +49,6 @@ plt.title("zscan")
 #than one value, etc 
 
 #Specular & background 
-
 spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / user_lambda
 bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / user_lambda
 diff_cps = spec_cps - bkg_cps

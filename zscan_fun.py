@@ -15,23 +15,28 @@ def eff_beam_height(z, cps):
     d1_fun = CubicSmoothingSpline(z, first_deriv, smooth=0.99995).spline
     d1 = d1_fun(linspace_z)
 
-    #edge case never gets above 0 ?
     min_pos_d1 = d1.argmin()
     curr_val = d1[min_pos_d1]
     curr_index = min_pos_d1
-    while curr_val < 0:
+    while curr_val < 0 and (curr_index < d1.size - 1):
         curr_index = curr_index + 1
         curr_val = d1[curr_index]
 
-    end_ind_d1= curr_index - 1
+    if curr_index != (d1.size - 1):
+        end_ind_d1 = curr_index - 1
+    else: 
+        end_ind_d1 = curr_index
 
     curr_val = d1[min_pos_d1]
     curr_index = min_pos_d1
-    while curr_val < 0:
+    while curr_val < 0 and (curr_index > 0):
         curr_index = curr_index - 1
         curr_val = d1[curr_index]
 
-    start_ind_d1 = curr_index + 1
+    if curr_index != 0:
+        start_ind_d1 = curr_index + 1
+    else: 
+        start_ind_d1= curr_index
 
     reduced_d1 = d1[start_ind_d1:end_ind_d1]
     reduced_z = linspace_z[start_ind_d1:end_ind_d1]
