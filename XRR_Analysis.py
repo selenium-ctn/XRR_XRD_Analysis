@@ -19,12 +19,6 @@ scan_speed = .25
 user_lambda = 1.54184 
 B = 10
 
-#zscan = open('Smartlab data/ZscanSTBXRR_0014_Scan2020Jan24-124745.dat', 'r')
-#xrr_spec = open('Smartlab data/spec2Pt111_Al2O3_006_1.dat', 'r')
-#xrr_bkg = open('Smartlab data/bkg2Pt111_Al2O3_006.dat', 'r')
-# not sure if this is the right set of files lol 
-# it's not hehe
-
 zscan = open('ATXG data/Zscan.dat', 'r')
 xrr_spec = open('ATXG data/spec_XRR.dat', 'r')
 xrr_bkg = open('ATXG data/BKG_XRR.dat', 'r')
@@ -40,8 +34,7 @@ spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
 bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
 
 zscan_cps = zscan_cps * 770.53
-spec_cps = spec_cps * 770.53
-bkg_cps = bkg_cps * 770.53
+#mult for zscan only!!! maybe don't worry...maybe do....tell user to use automatic filter or nah....
 
 #get the effective beam height, z locations where linear drop starts and ends, STB intensity 
 z_val_1, z_val_2, effective_beam_height = zscan_fun.eff_beam_height(zscan_z, zscan_cps)
@@ -79,7 +72,7 @@ highest_cps = np.maximum(diff_cps, gc_cps)
 plt.plot(spec_q, np.log10(highest_cps))
 
 norm_reflectivity = highest_cps / stb_inten
-#error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_size * 60 / scan_speed)) / stb_inten#
+error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_size * 60 / scan_speed)) / stb_inten
 #print(error_bars)
 
 plt.figure()
@@ -88,11 +81,12 @@ plt.xlabel("q (Angstroms)")
 plt.ylabel("Reflectivity")
 plt.title("q vs normalized intensity")
 plt.figure()
-#plt.errorbar(spec_q[5:], np.log10(norm_inten[5:]), yerr=np.log10(error_bars[5:]))
-#plt.errorbar(spec_q[5:], (norm_inten[5:]), yerr=error_bars[5:])
+#plt.errorbar(spec_q[5:], np.log10(norm_reflectivity[5:]), yerr=np.log10(error_bars[5:]))
+plt.errorbar(spec_q[5:], (norm_reflectivity[5:]), yerr=error_bars[5:])
 #plt.xlabel("q (Angstroms)")
 #plt.ylabel("Reflectivity")
 #plt.title("q vs normalized intensity")
+plt.show()
 
 norm_reflectivity = norm_reflectivity[4:]
 renorm_reflect = norm_reflectivity / np.amax(norm_reflectivity)
@@ -104,7 +98,7 @@ renorm_reflect_error = renorm_reflect * .05
 #for 
 #ya anyway write to file
 
-f = open("%s_XRR.txt" % (sample_name), "x")
-for (q, r, er) in zip(spec_q[4:], renorm_reflect, renorm_reflect_error):
-    f.write('{0} {1} {2} {3}\n'.format(q, r, er, dq))
-f.close()
+#f = open("%s_XRR.txt" % (sample_name), "x")
+#for (q, r, er) in zip(spec_q[4:], renorm_reflect, renorm_reflect_error):
+#    f.write('{0} {1} {2} {3}\n'.format(q, r, er, dq))
+#f.close()
