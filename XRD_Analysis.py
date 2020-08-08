@@ -6,6 +6,7 @@ import file_reading
 from math import pi
 from scipy.signal import argrelextrema 
 import heapq 
+from csaps import CubicSmoothingSpline
 
 #user_lambda = input("Enter lambda (Angstroms) ")
 user_lambda = 1.54184 
@@ -31,16 +32,66 @@ diff_cps = spec_cps - bkg_cps
 norm_reflectivity = diff_cps / stb_inten
 
 first_deriv = np.gradient(diff_cps, spec_q)
+#min_pos_d1 = first_deriv.argmin()
 
-min_pos_d1 = first_deriv.argmin()
-loc_min_d1 = argrelextrema(first_deriv, np.less)
-loc_min_d1, = loc_min_d1
-min_pos_2_d1 = loc_min_d1[0]
+loc_min_pos_d1 = argrelextrema(first_deriv, np.less)
+loc_min_pos_d1, = loc_min_pos_d1
+loc_min_val_d1 = first_deriv[loc_min_pos_d1]
 
-heapq.nlargest(2, xrange(first_deriv.size), key=first_deriv.__getitem__)
+d1_2_smallest = heapq.nsmallest(2, loc_min_val_d1)
+d1_min_pos = np.where( loc_min_val_d1 == d1_2_smallest[0])
+d1_min_pos = loc_min_pos_d1[d1_min_pos]
+d1_2_min_pos = np.where(loc_min_val_d1 == d1_2_smallest[1])
+d1_2_min_pos = loc_min_pos_d1[d1_2_min_pos]
 
+curr_index = d1_min_pos
+curr_val = first_deriv[d1_min_pos]
+while curr_val <= 0:
+    curr_index = curr_index + 1
+    curr_val = first_deriv[curr_index]
+
+end_ind_d1_min_1 = curr_index - 1
+
+curr_index = d1_2_min_pos
+curr_val = first_deriv[d1_2_min_pos]
+while curr_val <= 0:
+    curr_index = curr_index + 1
+    curr_val = first_deriv[curr_index]
+
+end_ind_d1_min_2 = curr_index - 1
+
+print([spec_q[end_ind_d1_min_1], spec_q[end_ind_d1_min_2]])
+
+loc_max_pos_d1 = argrelextrema(first_deriv, np.greater)
+loc_max_pos_d1, = loc_max_pos_d1
+loc_max_val_d1 = first_deriv[loc_max_pos_d1]
+
+d1_2_largest = heapq.nlargest(2, loc_max_val_d1)
+d1_max_pos = np.where( loc_max_val_d1 == d1_2_largest[0])
+d1_max_pos = loc_max_pos_d1[d1_max_pos]
+d1_2_max_pos = np.where(loc_max_val_d1 == d1_2_largest[1])
+d1_2_max_pos = loc_max_pos_d1[d1_2_max_pos]
+
+curr_index = d1_max_pos
+curr_val = first_deriv[d1_max_pos]
+while curr_val >= 0:
+    curr_index = curr_index - 1
+    curr_val = first_deriv[curr_index]
+
+end_ind_d1_max_1 = curr_index + 1
+
+curr_index = d1_2_max_pos
+curr_val = first_deriv[d1_2_max_pos]
+while curr_val >= 0:
+    curr_index = curr_index - 1
+    curr_val = first_deriv[curr_index]
+
+end_ind_d1_max_2 = curr_index + 1
+
+print([spec_q[end_ind_d1_max_1], spec_q[end_ind_d1_max_2]])
 
 plt.plot(spec_q, np.log10(diff_cps))
 plt.figure()
 plt.plot(spec_q, first_deriv)
+#plt.plot(linspace_q, d1)
 plt.show()

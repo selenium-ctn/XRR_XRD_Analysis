@@ -44,6 +44,8 @@ def eff_beam_height(z, cps):
     d2 = np.gradient(reduced_d1, reduced_z)
     d3 = np.gradient(d2, reduced_z)
 
+    #check over this....maybe shouldn't pick first local min but should do first
+    #that's not equal to the lowest min.....look at graphs again
     min_pos_d3 = d3.argmin()
     loc_min_d3 = argrelextrema(d3, np.less)
     loc_min_d3, = loc_min_d3
