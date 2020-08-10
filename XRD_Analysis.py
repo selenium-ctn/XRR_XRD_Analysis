@@ -33,7 +33,7 @@ bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / user_lambda
 diff_cps = spec_cps - bkg_cps
 norm_reflectivity = diff_cps / stb_inten
 
-bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak(spec_q, diff_cps)
+bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak(spec_q, norm_reflectivity)
 bragg_start_ind = bragg_start_ind[0]
 bragg_end_ind = bragg_end_ind[0]
 
@@ -48,6 +48,8 @@ p0 = [np.average([bragg_cps[0], bragg_cps[bragg_cps.size - 1]]), 10, (bragg_q[0]
 coeff, var_matrix = curve_fit(XRD_fun.gauss, bragg_q, bragg_cps, p0=p0)
 
 fit = XRD_fun.gauss(bragg_q, *coeff)
+FWHM = abs(np.sqrt(2 * np.log(2)) * coeff[2])
+
 #plt.plot(bragg_q, np.log10(bragg_cps))
 #plt.plot(bragg_q, fit)
 #plt.plot(bragg_q, np.log10(fit))
