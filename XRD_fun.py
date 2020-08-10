@@ -1,6 +1,7 @@
 from scipy.signal import argrelextrema 
 import heapq 
 import numpy as np
+from math import pi
 
 def find_bragg_peak(q, cps):
     """Determines the q values that mark the beginning and the end of the Bragg peak 
@@ -79,3 +80,9 @@ def find_peak_end(arr, index):
         curr_val = arr[curr_index]
 
     return curr_index - 1
+
+def gauss(x, *p):
+    y0, A, w, xc = p 
+    return y0 + (A / (w * np.sqrt(pi / 2))) * np.exp(-2 * np.power((x - xc), 2) / np.power(w, 2))
+    #return [y0 + A / (w * np.sqrt(pi / 2)) * exp(-2 * ((x_i - xc)**2) / (w**2)) for x_i in x]
+

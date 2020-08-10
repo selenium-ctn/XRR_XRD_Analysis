@@ -8,6 +8,7 @@ from scipy.signal import argrelextrema
 import heapq 
 from csaps import CubicSmoothingSpline
 import XRD_fun
+from scipy.optimize import curve_fit
 
 #user_lambda = input("Enter lambda (Angstroms) ")
 user_lambda = 1.54184 
@@ -33,6 +34,30 @@ diff_cps = spec_cps - bkg_cps
 norm_reflectivity = diff_cps / stb_inten
 
 bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak(spec_q, diff_cps)
+bragg_start_ind = bragg_start_ind[0]
+bragg_end_ind = bragg_end_ind[0]
+
+bragg_cps = diff_cps[bragg_start_ind:bragg_end_ind]
+bragg_q = spec_q[bragg_start_ind:bragg_end_ind]
+
+#p0 = [np.zeros([1, bragg_q.size]), 1, 1, np.zeros([1, bragg_q.size])]
+p0 = [np.average([bragg_cps[0], bragg_cps[bragg_cps.size - 1]]), 10, (bragg_q[0] - bragg_q[bragg_q.size - 1]) / 2, np.average([bragg_q[0], bragg_q[bragg_q.size - 1]])]
+#p0 = [np.log10(np.average([bragg_cps[0], bragg_cps[bragg_cps.size - 1]])), .1, 1, np.average([bragg_q[0], bragg_q[bragg_q.size - 1]])]
+#np.log10(bragg_cps[0])
+#coeff, var_matrix = curve_fit(XRD_fun.gauss, bragg_q, np.log10(bragg_cps), p0=p0)
+coeff, var_matrix = curve_fit(XRD_fun.gauss, bragg_q, bragg_cps, p0=p0)
+
+fit = XRD_fun.gauss(bragg_q, *coeff)
+#plt.plot(bragg_q, np.log10(bragg_cps))
+#plt.plot(bragg_q, fit)
+#plt.plot(bragg_q, np.log10(fit))
+plt.plot(bragg_q, bragg_cps)
+#plt.plot(bragg_q, fit)
+plt.plot(bragg_q, fit)
+plt.show()
+plt.figure()
+plt.plot(bragg_q, bragg_cps)
+plt.figure()
 
 print((spec_q[bragg_start_ind], spec_q[bragg_end_ind]))
 first_deriv = np.gradient(diff_cps, spec_q)
@@ -40,4 +65,3 @@ plt.plot(spec_q, np.log10(diff_cps))
 plt.figure()
 plt.plot(spec_q, first_deriv)
 #plt.plot(linspace_q, d1)
-plt.show()
