@@ -41,8 +41,7 @@ zscan_cps = zscan_cps * 770.53
 #mult for zscan only!!! maybe don't worry...maybe do....tell user to use automatic filter or nah....
 
 #get the effective beam height, z locations where linear drop starts and ends, STB intensity 
-z_val_1, z_val_2, effective_beam_height = zscan_fun.eff_beam_height(zscan_z, zscan_cps)
-stb_inten = zscan_fun.STB_intensity(zscan_z, zscan_cps, min(z_val_1, z_val_2))
+stb_inten, effective_beam_height = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps)
 print(effective_beam_height)
 print(stb_inten)
 
