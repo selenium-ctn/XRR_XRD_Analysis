@@ -79,17 +79,20 @@ error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_
 print(error_bars)
 
 plt.figure()
-plt.plot(spec_q, np.log10(norm_reflectivity))
+plt.plot(spec_q, norm_reflectivity)
+plt.yscale("log")
 plt.xlabel("q (Angstroms)")
 plt.ylabel("Reflectivity")
 plt.title("q vs normalized intensity")
 plt.figure()
-plt.errorbar(spec_q[5:], np.log10(norm_reflectivity[5:]), yerr=np.log10(error_bars[5:]))
+plt.errorbar(spec_q[5:], norm_reflectivity[5:], yerr=error_bars[5:])
 #plt.errorbar(spec_q[5:], (norm_reflectivity[5:]), yerr=error_bars[5:])
 #plt.xlabel("q (Angstroms)")
 #plt.ylabel("Reflectivity")
 #plt.title("q vs normalized intensity")
+plt.yscale("log")
 plt.show()
+print(norm_reflectivity)
 
 norm_reflectivity = norm_reflectivity[4:]
 renorm_reflect = norm_reflectivity / np.amax(norm_reflectivity)
@@ -105,3 +108,5 @@ renorm_reflect_error = renorm_reflect * .05
 #for (q, r, er) in zip(spec_q[4:], renorm_reflect, renorm_reflect_error):
 #    f.write('{0} {1} {2} {3}\n'.format(q, r, er, dq))
 #f.close()
+
+
