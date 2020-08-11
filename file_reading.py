@@ -9,11 +9,11 @@ def pull_data(file):
     """
     array1 = []
     array2 = []
+    #only reads lines beginning with a number or a negative sign 
     exclude = re.compile(r"[\d-]")
 
     for line in file:
         if exclude.match(line):
-            #var1, var2 = line.split(' ')
             var1, var2 = line.split()
             var2 = var2.strip('\n')
             array1.append(float(var1))

@@ -45,65 +45,50 @@ stb_inten, effective_beam_height = zscan_fun.stb_intensity_and_eff_beam_height(z
 print(effective_beam_height)
 print(stb_inten)
 
-#plot z vs cps 
-plt.plot(zscan_z, zscan_cps)
-plt.xlabel("z (mm)")
-plt.ylabel("cps")
-plt.title("zscan")
-
-#still need: beautify graph, test effective beam height with
-#multiple files, make sure edge cases are covered, tuple never has more 
-#than one value, etc 
-
-#Specular & background 
+#specular & background 
 spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / user_lambda
 bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / user_lambda
 diff_cps = spec_cps - bkg_cps
 
-#Geometrical correction
+#geometrical correction
+#account for divide by 0 warning? 
 gc_cps = (effective_beam_height / ( B * np.sin(np.deg2rad(spec_theta /  2)))) * diff_cps
 
-plt.figure()
-#plt.plot(spec_q, np.log10(spec_cps))
-#plt.plot(bkg_q, np.log10(bkg_cps))
-
-plt.plot(spec_q, np.log10(diff_cps))
-#spec q and bkg q should be the same right? 
-plt.plot(spec_q, np.log10(gc_cps))
-
+#take the highest values 
 highest_cps = np.maximum(diff_cps, gc_cps)
-plt.plot(spec_q, np.log10(highest_cps))
 
+#normalize by stb intensity
 norm_reflectivity = highest_cps / stb_inten
-error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_size * 60 / scan_speed)) / stb_inten
-print(error_bars)
 
+#compute error bars 
+error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_size * 60 / scan_speed)) / stb_inten
+
+#plot q vs reflectivity 
 plt.figure()
 plt.plot(spec_q, norm_reflectivity)
 plt.yscale("log")
-plt.xlabel("q (Angstroms)")
+plt.xlabel(r'q ($\mathrm{\AA}$)')
 plt.ylabel("Reflectivity")
-plt.title("q vs normalized intensity")
+plt.title("q vs Reflectivity")
+
+#plot q vs reflectivity with error bars 
 plt.figure()
-plt.errorbar(spec_q[5:], norm_reflectivity[5:], yerr=error_bars[5:])
-#plt.errorbar(spec_q[5:], (norm_reflectivity[5:]), yerr=error_bars[5:])
-#plt.xlabel("q (Angstroms)")
-#plt.ylabel("Reflectivity")
-#plt.title("q vs normalized intensity")
+plt.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:])
+plt.xlabel(r'q ($\mathrm{\AA}$)')
+plt.ylabel("Reflectivity")
+plt.title("q vs Reflectivity")
 plt.yscale("log")
 plt.show()
-print(norm_reflectivity)
 
+#exclude first 5 data points (creates a less messy file for motofit). renormalize reflectivity w/ the highest value. 
+#calculate the renormalized reflectivity error. 
 norm_reflectivity = norm_reflectivity[4:]
 renorm_reflect = norm_reflectivity / np.amax(norm_reflectivity)
-dq = .00778 
+dq = .00778 #machine dependent
 renorm_reflect_error = renorm_reflect * .05 
 
-#naming convention 
-#f = open("insert_name_here", "w")
-#for 
-#ya anyway write to file
-
+#write data to text file for motofit to use
+#maybe do a version or hash thing where if there's already a file created, another w/ a diff suffix can be created 
 #f = open("%s_XRR.txt" % (sample_name), "x")
 #for (q, r, er) in zip(spec_q[4:], renorm_reflect, renorm_reflect_error):
 #    f.write('{0} {1} {2} {3}\n'.format(q, r, er, dq))

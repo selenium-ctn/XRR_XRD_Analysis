@@ -61,30 +61,32 @@ def stb_intensity_and_eff_beam_height(z, cps):
     new_cps = cps[filter_arr]
 
     #do a linear regression on the filtered data set to get the slope and the intercept 
-    slope, inter, r_value, p_value, std_err = linregress(new_z, new_cps)
+    slope, inter, _, _, _ = linregress(new_z, new_cps)
 
     #calculate the STB intensity 
-    stb = STB_intensity(z, cps, stb_plat_z_val)
+    filter_arr = (z <= stb_plat_z_val)
+    stb_reduced_cps = cps[filter_arr]
+    stb = np.mean(stb_reduced_cps)
 
     #calculate the z values from the linear regression when cps = STB intensity and cps = 0
     z_1 = (stb - inter) / slope
     z_2 = - inter / slope 
 
+    #plot z vs cps 
+    plt.plot(z, cps)
+    plt.xlabel("z (mm)")
+    plt.ylabel("cps")
+    plt.title("zscan")
+
+    plt.figure()
+    plt.plot(z, cps)
+    plt.vlines(z_1, 0, stb, linestyles='dashed')
+    plt.vlines(z_2, 0, stb, linestyles='dashed')
+    plt.plot(reduced_z, inter + slope * reduced_z)
+    #plt.text(1, 1, "effective beam height = %d" % abs(z_1 - z_2)) #transform axes from data coords to axis coords!
+    plt.xlabel("z (mm)")
+    plt.ylabel("cps")
+    plt.title("zscan")
+
     return stb, abs(z_1 - z_2)
         
-def STB_intensity(z_arr, cps_arr, z_end_val):
-    """Determines the straight to beam intensity from XRR zscan data.
-
-    cps_arr = numpy array of cps data, z_end_val = the last 
-    value of the high plateau
-    """
-    curr_pos = z_arr.size - 1
-    curr_val = z_arr[curr_pos]
-    while curr_val > z_end_val: 
-        curr_val = z_arr[curr_pos]
-        curr_pos = curr_pos - 1
-    
-    end_pos = curr_pos + 1
-    reduced_cps = cps_arr[0:end_pos]
-
-    return np.mean(reduced_cps)
