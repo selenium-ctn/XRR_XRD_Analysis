@@ -82,6 +82,8 @@ def stb_intensity_and_eff_beam_height(z, cps):
     plt.plot(z, cps)
     plt.vlines(z_1, 0, stb, linestyles='dashed')
     plt.vlines(z_2, 0, stb, linestyles='dashed')
+    plt.hlines(stb, z[0], z_1, color="black")
+    plt.hlines(0, z_2, z[z.size - 1], color="black")
     plt.plot(reduced_z, inter + slope * reduced_z)
     #plt.text(1, 1, "effective beam height = %d" % abs(z_1 - z_2)) #transform axes from data coords to axis coords!
     plt.xlabel("z (mm)")

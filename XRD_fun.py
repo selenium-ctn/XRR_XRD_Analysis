@@ -114,3 +114,6 @@ def gauss(x, *p):
     return y0 + (A / (w * np.sqrt(pi / 2))) * np.exp(-2 * np.power((x - xc), 2) / np.power(w, 2))
     #return [y0 + A / (w * np.sqrt(pi / 2)) * exp(-2 * ((x_i - xc)**2) / (w**2)) for x_i in x]
 
+def lorentz(x, *p):
+    y0, A, w, xc = p
+    return y0 + (2 * A / pi) * (w / (4 * np.power((x - xc), 2) + np.power(w, 2)))

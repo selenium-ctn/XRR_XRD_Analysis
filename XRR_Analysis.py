@@ -73,7 +73,7 @@ plt.title("q vs Reflectivity")
 
 #plot q vs reflectivity with error bars 
 plt.figure()
-plt.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:])
+plt.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')
 plt.xlabel(r'q ($\mathrm{\AA}$)')
 plt.ylabel("Reflectivity")
 plt.title("q vs Reflectivity")

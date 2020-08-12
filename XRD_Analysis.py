@@ -15,15 +15,18 @@ user_lambda = 1.54184
 step_size = .02
 scan_speed = .25
 
-zscan = open('Smartlab data/ZscanSTBXRR_0014_Scan2020Jan24-124745.dat', 'r')
+zscan = open('Smartlab data/Zscan_0007_Scan2020Jan23-191605.dat', 'r')
 xrr_spec = open('Smartlab data/spec2Pt111_Al2O3_006_1.dat', 'r')
 xrr_bkg = open('Smartlab data/bkg2Pt111_Al2O3_006.dat', 'r')
-#right set of data? Who knows lolol 
+rocking = open('Smartlab data/RC_Pt_111_0013_Scan2020Jan23-194300_1.dat', 'r')
+
+#xrr_spec = open('Smartlab data/2theta_Al2O3_0016_Scan2020Jan23-192933.dat', 'r')
 
 # read files into lists, turn lists into numpy matrices
 zscan_z, zscan_cps = file_reading.pull_data(zscan)
 spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
 bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
+rock_theta, rock_cps = file_reading.pull_data(rocking) #maybe I should change theta on spec and bkg to 2theta for clarity 
 
 #get the effective beam height, STB intensity 
 stb_inten, effective_beam_height = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps)
@@ -76,17 +79,39 @@ plt.yscale("log")
 
 plt.figure()
 plt.plot(spec_q, norm_reflectivity)
+plt.plot(bragg_q, fit, label="Gaussian fit")
 plt.xlabel(r'q ($\mathrm{\AA}$)')
 plt.ylabel("Reflectivity")
 plt.title("q vs Reflectivity")
 plt.yscale("log")
 
 plt.figure()
-plt.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:])
+plt.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')
 plt.xlabel(r'q ($\mathrm{\AA}$)')
 plt.ylabel("Reflectivity")
 plt.title("q vs Reflectivity")
 plt.yscale("log")
-plt.show()
 
+#find the start and end indices of the bragg peak
+rc_start_ind, rc_end_ind = XRD_fun.find_bragg_peak(rock_theta, (rock_cps / stb_inten)) 
+rc_start_ind = rc_start_ind[0]
+rc_end_ind = rc_end_ind[0]
+
+#reduce the data to only the bragg peak -- this is the data to be used when Gaussian fitting the bragg peak 
+rc_refl = (rock_cps / stb_inten)[rc_start_ind:rc_end_ind]
+rc_btheta = rock_theta[rc_start_ind:rc_end_ind]
+
+p0 = [np.average([rc_refl[0], rc_refl[rc_refl.size - 1]]), 10, (rc_btheta[0] - rc_btheta[rc_btheta.size - 1]) / 2, np.average([rc_btheta[0], rc_btheta[rc_btheta.size - 1]])]
+coeff, var_matrix = curve_fit(XRD_fun.gauss, rc_btheta, rc_refl, p0=p0)
+
+fit2 = XRD_fun.gauss(rc_btheta, *coeff)
+
+plt.figure()
+plt.plot(rock_theta, rock_cps)
+plt.yscale("log")
+
+plt.figure()
+plt.plot(rc_btheta, rc_refl, label="raw data")
+plt.plot(rc_btheta, fit2, label="Gaussian fit")
+plt.show()
 
