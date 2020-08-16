@@ -1,4 +1,4 @@
-from scipy.signal import argrelextrema 
+from scipy.signal import argrelextrema, find_peaks, peak_prominences, find_peaks_cwt
 import heapq 
 import numpy as np
 from math import pi
@@ -117,3 +117,24 @@ def gauss(x, *p):
 def lorentz(x, *p):
     y0, A, w, xc = p
     return y0 + (2 * A / pi) * (w / (4 * np.power((x - xc), 2) + np.power(w, 2)))
+
+def find_bragg_peak_alt(q, cps):
+    #peaks, _ = find_peaks(cps)
+    #prominences = peak_prominences(cps, peaks)[0]
+    #contour_heights = cps[peaks] - prominences
+    #plt.plot(q, cps)
+    #plt.plot(peaks, cps[peaks], "x")
+    #plt.vlines(x=peaks, ymin=contour_heights, ymax=cps[peaks])
+
+    #not sure how big I should make the widths....ask Carlos about max bragg peak sizes
+    peaks = find_peaks_cwt(cps, np.linspace(1, 20))
+    prom, lb, rb = peak_prominences(cps, peaks, wlen=20)
+    plt.figure()
+    plt.plot(q, cps)
+    plt.plot(q[peaks], cps[peaks], "x")
+    plt.plot(q[lb], cps[lb], 'o')
+    plt.plot(q[rb], cps[rb], 'o')
+    plt.yscale("log")
+
+
+    

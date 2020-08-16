@@ -92,6 +92,8 @@ plt.ylabel("Reflectivity")
 plt.title("q vs Reflectivity")
 plt.yscale("log")
 
+XRD_fun.find_bragg_peak_alt(spec_q, norm_reflectivity)
+
 #find the start and end indices of the bragg peak
 rc_start_ind, rc_end_ind = XRD_fun.find_bragg_peak(rock_theta, (rock_cps / stb_inten)) 
 rc_start_ind = rc_start_ind[0]
