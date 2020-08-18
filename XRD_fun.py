@@ -129,6 +129,7 @@ def find_bragg_peak_alt(q, cps):
     #positions, referring to positions in the first_deriv array where the peaks are located 
     first_deriv = np.gradient(cps, q)
     peaks_1d =  find_peaks_cwt(first_deriv, np.linspace(1, 10, num=50))
+    #peaks_1d =  find_peaks_cwt(first_deriv, np.linspace(1, 2, num=50))
 
     #find the widths (and other associtated values) of the peaks in the first dervative. This is more accurate than finding the widths of the peaks in the original 
     #data. rel_height=1 means the left and right bases are being found at the lowest contour lines of the peak  
@@ -213,6 +214,31 @@ def find_bragg_peak_alt(q, cps):
     plt.plot(q[peaks_1d], first_deriv[peaks_1d], "x")
     plt.hlines(width_heights, q[left_ips.astype(np.int)], q[right_ips.astype(np.int)])
 
+    return curr_index, (right_ips[bragg_peak_1d] - adjust + widths[bragg_peak_1d]).astype(np.int)
 
+def find_bragg_peak_rc(q, cps):
+    #use for substrate peaks actually
+    orig_peaks = find_peaks_cwt(cps, np.linspace(1, 10, num=50))
+    widths, width_heights, left_ips, right_ips = peak_widths(cps, orig_peaks, rel_height=.999)
+    print(widths)
+    plt.figure()
+    plt.plot(q, cps)
+    plt.plot(q[orig_peaks], cps[orig_peaks], "x")
+    plt.hlines(width_heights, q[left_ips.astype(np.int)], q[right_ips.astype(np.int)])
+    plt.yscale("log")
+    
+    #create an array of the values of the peaks 
+    loc_max_vals = cps[orig_peaks]
 
+    #find the two highest peak values 
+    max_1_val = heapq.nlargest(1, loc_max_vals)
+
+    #find the position of the array containing the values of the peaks associated with the highest peak (also corresponds to position
+    #in array of positions of peak values in first_deriv)
+    loc_max_pos_1 = np.where( loc_max_vals == max_1_val[0])
+
+    #find position of highest peak in first_deriv array 
+    peaks_pos_1 = orig_peaks[loc_max_pos_1]
+
+    return left_ips[loc_max_pos_1].astype(np.int), right_ips[loc_max_pos_1].astype(np.int)
     

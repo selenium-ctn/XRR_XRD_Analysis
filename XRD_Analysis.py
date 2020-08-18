@@ -21,6 +21,7 @@ xrr_bkg = open('Smartlab data/bkg2Pt111_Al2O3_006.dat', 'r')
 rocking = open('Smartlab data/RC_Pt_111_0013_Scan2020Jan23-194300_1.dat', 'r')
 
 #xrr_spec = open('Smartlab data/2theta_Al2O3_0016_Scan2020Jan23-192933.dat', 'r')
+rocking = open('Smartlab data/RC_Al2O3_0010_Scan2020Jan23-193141.dat', 'r')
 
 # read files into lists, turn lists into numpy matrices
 zscan_z, zscan_cps = file_reading.pull_data(zscan)
@@ -36,14 +37,16 @@ spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / user_lambda
 bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / user_lambda
 
 #difference between specular cps and background cps; normalize by STB intensity 
-diff_cps = spec_cps - bkg_cps
+diff_cps = spec_cps #- bkg_cps
 norm_reflectivity = diff_cps / stb_inten
 
 #compute error bars 
 error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_size * 60 / scan_speed)) / stb_inten
 
 #find the start and end indices of the bragg peak
-bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak(spec_q, norm_reflectivity)
+#bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak(spec_q, norm_reflectivity)
+bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak_alt(spec_q, norm_reflectivity)
+#bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak_rc(spec_q, norm_reflectivity)
 bragg_start_ind = bragg_start_ind[0]
 bragg_end_ind = bragg_end_ind[0]
 
@@ -92,21 +95,20 @@ plt.ylabel("Reflectivity")
 plt.title("q vs Reflectivity")
 plt.yscale("log")
 
-XRD_fun.find_bragg_peak_alt(spec_q, norm_reflectivity)
-
 #find the start and end indices of the bragg peak
-rc_start_ind, rc_end_ind = XRD_fun.find_bragg_peak(rock_theta, (rock_cps / stb_inten)) 
+#rc_start_ind, rc_end_ind = XRD_fun.find_bragg_peak(rock_theta, (rock_cps / stb_inten)) 
+rc_start_ind, rc_end_ind = XRD_fun.find_bragg_peak_rc(rock_theta, (rock_cps / stb_inten)) 
 rc_start_ind = rc_start_ind[0]
 rc_end_ind = rc_end_ind[0]
 
-#reduce the data to only the bragg peak -- this is the data to be used when Gaussian fitting the bragg peak 
+#reduce the data to only the bragg peak -- this is the data to be used when lorentz fitting the bragg peak 
 rc_refl = (rock_cps / stb_inten)[rc_start_ind:rc_end_ind]
 rc_btheta = rock_theta[rc_start_ind:rc_end_ind]
 
 p0 = [np.average([rc_refl[0], rc_refl[rc_refl.size - 1]]), 10, (rc_btheta[0] - rc_btheta[rc_btheta.size - 1]) / 2, np.average([rc_btheta[0], rc_btheta[rc_btheta.size - 1]])]
-coeff, var_matrix = curve_fit(XRD_fun.gauss, rc_btheta, rc_refl, p0=p0)
+coeff, var_matrix = curve_fit(XRD_fun.lorentz, rc_btheta, rc_refl, p0=p0)
 
-fit2 = XRD_fun.gauss(rc_btheta, *coeff)
+fit2 = XRD_fun.lorentz(rc_btheta, *coeff)
 
 plt.figure()
 plt.plot(rock_theta, rock_cps)
@@ -114,6 +116,10 @@ plt.yscale("log")
 
 plt.figure()
 plt.plot(rc_btheta, rc_refl, label="raw data")
-plt.plot(rc_btheta, fit2, label="Gaussian fit")
+plt.plot(rc_btheta, fit2, label="Lorentz fit")
 plt.show()
+
+
+
+
 
