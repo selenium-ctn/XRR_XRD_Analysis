@@ -14,6 +14,8 @@ from scipy.optimize import curve_fit
 user_lambda = 1.54184 
 step_size = .02
 scan_speed = .25
+spec_res = 0 
+rocking_res = 0 
 
 zscan = open('Smartlab data/Zscan_0007_Scan2020Jan23-191605.dat', 'r')
 xrr_spec = open('Smartlab data/spec2Pt111_Al2O3_006_1.dat', 'r')
@@ -65,6 +67,9 @@ coeff, var_matrix = curve_fit(XRD_fun.gauss, bragg_q, bragg_refl, p0=p0)
 
 fit = XRD_fun.gauss(bragg_q, *coeff)
 FWHM = abs(np.sqrt(2 * np.log(2)) * coeff[2])
+
+#vertical domain size 
+vert_domain_size = 2 * pi * 0.94 / np.sqrt(np.power(FWHM, 2) - np.power(spec_res, 2))
 
 #plt.plot(bragg_q, np.log10(bragg_cps))
 #plt.plot(bragg_q, fit)
