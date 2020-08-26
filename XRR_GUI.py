@@ -1,13 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog, LabelFrame
-import test2
+import XRR_Analysis_compat as XAC 
 import sys
 import os
 import subprocess
-
-def printtext(e):
-    test2.e = e
 
 class GUI:
     def __init__(self, master):
@@ -48,7 +45,7 @@ class GUI:
         bkg= filedialog.askopenfile(initialdir = "/", title="Select background file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
 
     def run(self):
-        zscan_data, spec_data, bkg_data = test2.init_data(zscan, spec, bkg)
+        zscan_data, spec_data, bkg_data = XAC.init_data(zscan, spec, bkg)
         print(zscan_data)
 
 root = tk.Tk()
