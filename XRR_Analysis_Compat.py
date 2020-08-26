@@ -43,3 +43,64 @@ def init_data(zscan, xrr_spec, xrr_bkg):
     zscan_cps = zscan_cps * filter
     #mult for zscan only!!! maybe don't worry...maybe do....tell user to use automatic filter or nah....
     return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
+
+def zscan_func(zscan_z, zscan_cps):
+    #get the effective beam height, STB intensity 
+    stb_inten, effective_beam_height = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps) 
+    return stb_inten, effective_beam_height
+
+def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_theta, bkg_cps):
+    #specular & background 
+    spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / user_lambda
+    bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / user_lambda
+    diff_cps = spec_cps - bkg_cps
+
+    #geometrical correction
+    #account for divide by 0 warning? 
+    gc_cps = (effective_beam_height / ( B * np.sin(np.deg2rad(spec_theta /  2)))) * diff_cps
+
+    #take the highest values 
+    highest_cps = np.maximum(diff_cps, gc_cps)
+
+    #normalize by stb intensity
+    norm_reflectivity = highest_cps / stb_inten
+
+    #compute error bars 
+    error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_size * 60 / scan_speed)) / stb_inten
+
+    #plot q vs reflectivity 
+    plt.figure()
+    plt.plot(spec_q, norm_reflectivity)
+    plt.yscale("log")
+    plt.xlabel(r'q ($\mathrm{\AA}$)')
+    plt.ylabel("Reflectivity")
+    plt.title("q vs Reflectivity")
+
+    #plot q vs reflectivity with error bars 
+    plt.figure()
+    plt.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')
+    plt.xlabel(r'q ($\mathrm{\AA}$)')
+    plt.ylabel("Reflectivity")
+    plt.title("q vs Reflectivity")
+    plt.yscale("log")
+    plt.show()
+
+    #exclude first 5 data points (creates a less messy file for motofit). renormalize reflectivity w/ the highest value. 
+    #calculate the renormalized reflectivity error. 
+    norm_reflectivity = norm_reflectivity[4:]
+    renorm_reflect = norm_reflectivity / np.amax(norm_reflectivity)
+    dq = .00778 #machine dependent
+    renorm_reflect_error = renorm_reflect * .05 
+
+    #change location of dq - should probs be in GUI file 
+
+    return renorm_reflect, renorm_reflect_error, dq
+
+def save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq):
+    #write data to text file for motofit to use
+    #maybe do a version or hash thing where if there's already a file created, another w/ a diff suffix can be created 
+    #choose where to save to?
+    f = open("%s_XRR.txt" % (sample_name), "x")
+    for (q, r, er) in zip(spec_q[4:], renorm_reflect, renorm_reflect_error):
+        f.write('{0} {1} {2} {3}\n'.format(q, r, er, dq))
+    f.close()

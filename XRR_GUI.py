@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog, LabelFrame
-import XRR_Analysis_compat as XAC 
-import sys
-import os
-import subprocess
+import XRR_Analysis_Compat as XAC 
+#import sys
+#import os
+#import subprocess
 
 class GUI:
     def __init__(self, master):
@@ -46,7 +46,11 @@ class GUI:
 
     def run(self):
         zscan_data, spec_data, bkg_data = XAC.init_data(zscan, spec, bkg)
-        print(zscan_data)
+        stb_inten, effective_beam_height = XAC.zscan_func(zscan_data[0], zscan_data[1])
+        renorm_reflect, renorm_reflect_error, dq = XAC.spec_bkg_func(stb_inten, effective_beam_height, spec_data[0], spec_data[1], bkg_data[0], bkg_data[1])
+        print(renorm_reflect)
+
+        
 
 root = tk.Tk()
 gui = GUI(root)
@@ -82,17 +86,17 @@ def main():
     tabControl.pack(expand=1, fill="both")
     root.mainloop()
 
-main()
+#main()
 
 #parent window
-root = tk.Tk()
-root.title("XRR/XRD Data Reduction")
-tabControl = ttk.Notebook(root)
-xrr_tab = ttk.Frame(tabControl)
-xrd_tab = ttk.Frame(tabControl)
-tabControl.add(xrr_tab, text='XRR')
-tabControl.add(xrd_tab, text='XRD')
-tabControl.pack(expand=1, fill="both")
+#root = tk.Tk()
+#root.title("XRR/XRD Data Reduction")
+#tabControl = ttk.Notebook(root)
+#xrr_tab = ttk.Frame(tabControl)
+#xrd_tab = ttk.Frame(tabControl)
+#tabControl.add(xrr_tab, text='XRR')
+#tabControl.add(xrd_tab, text='XRD')
+#tabControl.pack(expand=1, fill="both")
 #use a button or drop down so people can change if they choose the wrong one
 #xrr_tab.zscan = filedialog.askopenfile(initialdir = "/", title="Select zscan file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")))
 #xrr_tab.specular = filedialog.askopenfile(initialdir = "/", title="Select specular file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")))
