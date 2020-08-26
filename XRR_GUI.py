@@ -1,6 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog, LabelFrame
+import test2
+import sys
+import os
+import subprocess
+
+def printtext(e):
+    test2.e = e
 
 class GUI:
     def __init__(self, master):
@@ -14,15 +21,35 @@ class GUI:
         tabControl.pack(expand=1, fill="both")
         self.label = ttk.Label(xrr_tab, text="test baybeee")
         self.label.pack()
-        self.button = ttk.Button(text = "Browse A File",command = self.fileDialog)
+        self.button = ttk.Button(text = "Select zscan file",command = self.fileDialogZscan)
+        self.button.pack()
+        self.button = ttk.Button(text = "Select specular file",command = self.fileDialogSpec)
+        self.button.pack()
+        self.button = ttk.Button(text = "Select background file",command = self.fileDialogBkg)
+        self.button.pack()
+        self.button = ttk.Button(text = "Run",command = self.run)
         self.button.pack()
 
-    def fileDialog(self):
- 
-        self.zscan = filedialog.askopenfile(initialdir = "/", title="Select zscan file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")))
-        self.label = ttk.Label(text = "")
-        self.label.grid(column = 1, row = 2)
-        self.label.configure(text = self.zscan)
+    def fileDialogZscan(self):
+        global zscan
+        zscan = filedialog.askopenfile(initialdir = "/", title="Select zscan file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+        #printtext(zscan)
+        #test2.zscan = zscan
+
+    def fileDialogSpec(self):
+        global spec
+        #subprocess.run('python test3.py')
+        #os.system('python test3.py')
+        spec= filedialog.askopenfile(initialdir = "/", title="Select specular file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+        #print(self.spec)
+
+    def fileDialogBkg(self):
+        global bkg
+        bkg= filedialog.askopenfile(initialdir = "/", title="Select background file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+
+    def run(self):
+        zscan_data, spec_data, bkg_data = test2.init_data(zscan, spec, bkg)
+        print(zscan_data)
 
 root = tk.Tk()
 gui = GUI(root)
