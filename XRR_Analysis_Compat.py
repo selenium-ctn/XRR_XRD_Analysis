@@ -7,6 +7,7 @@ import re
 import zscan_fun 
 import file_reading
 from scipy.stats import linregress
+import config
 
 #ask user for input values 
 #user_lambda = input("Enter lambda (Angstroms) ")
@@ -17,8 +18,8 @@ from scipy.stats import linregress
  
 #init params  
 sample_name = "testing"
-step_size = .02
-scan_speed = .25
+#step_size = .02
+#scan_speed = .25
 user_lambda = 1.54184 
 B = 10
 filter = 770.53 # or 0 
@@ -35,9 +36,9 @@ def init_data(zscan, xrr_spec, xrr_bkg):
     #zscan = open('Zscan_XRR_0009_Scan2020Feb07-220747.DAT', 'r')
 
     #read files into lists, turn lists into numpy matrices
-    zscan_z, zscan_cps = file_reading.pull_data(zscan)
-    spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
-    bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
+    zscan_z, zscan_cps = file_reading.pull_data(zscan, False)
+    spec_theta, spec_cps = file_reading.pull_data(xrr_spec, True)
+    bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg, False)  
 
     #apply filter if necessary 
     zscan_cps = zscan_cps * filter
@@ -66,7 +67,7 @@ def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_th
     norm_reflectivity = highest_cps / stb_inten
 
     #compute error bars 
-    error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_size * 60 / scan_speed)) / stb_inten
+    error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed) + (bkg_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
 
     #plot q vs reflectivity 
     plt.figure()

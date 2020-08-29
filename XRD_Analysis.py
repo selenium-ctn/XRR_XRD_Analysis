@@ -26,10 +26,10 @@ rocking = open('Smartlab data/RC_Pt_111_0013_Scan2020Jan23-194300_1.dat', 'r')
 rocking = open('Smartlab data/RC_Al2O3_0010_Scan2020Jan23-193141.dat', 'r')
 
 # read files into lists, turn lists into numpy matrices
-zscan_z, zscan_cps = file_reading.pull_data(zscan)
-spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
-bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
-rock_theta, rock_cps = file_reading.pull_data(rocking) #maybe I should change theta on spec and bkg to 2theta for clarity 
+zscan_z, zscan_cps = file_reading.pull_data(zscan, False)
+spec_theta, spec_cps = file_reading.pull_data(xrr_spec, True)
+bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg, False)  
+rock_theta, rock_cps = file_reading.pull_data(rocking, False) #maybe I should change theta on spec and bkg to 2theta for clarity 
 
 #get the effective beam height, STB intensity 
 stb_inten, effective_beam_height = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps)
