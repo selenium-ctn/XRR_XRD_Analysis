@@ -23,7 +23,7 @@ class GUI:
         self.button = ttk.Button(xrr_tab, text = "Select zscan file",command = self.fileDialogZscan)
         self.button.grid(pady=2.5, sticky="W", row=1, column=0)
         self.label = ttk.Label(xrr_tab, textvariable=tk_zscan)
-        #self.label.grid(row=1, column=1)
+        self.label.grid(row=1, column=1)
         #self.button.pack()
         #self.label = ttk.Label(xrr_tab, text=zscan)
         #self.label.pack()
@@ -38,9 +38,10 @@ class GUI:
         global zscan
         #zscan = "empty"
         zscan = filedialog.askopenfile(initialdir = "/", title="Select zscan file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+        tk_zscan.set(zscan)
         #if zscan != "empty":
          #   tk_zscan.set(zscan)
-        #printtext(zscan)
+        print(zscan)
         #test2.zscan = zscan
 
     def fileDialogSpec(self):
