@@ -18,7 +18,7 @@ class GUI:
         xrd_tab = ttk.Frame(tabControl)
         tabControl.add(xrr_tab, text='XRR')
         tabControl.add(xrd_tab, text='XRD')
-        #tabControl.pack(expand=1, fill="both")
+        tabControl.pack(expand=1, fill="both")
         tabControl.grid(sticky="W")
         self.button = ttk.Button(xrr_tab, text = "Select zscan file",command = self.fileDialogZscan)
         self.button.grid(pady=2.5, sticky="W", row=1, column=0)
