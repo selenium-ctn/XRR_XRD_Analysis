@@ -1,6 +1,6 @@
-sample_name = "default"
-step_size = "empty"
-scan_speed = "empty"
-user_lambda = "empty" 
-B = "empty"
-filter = "empty"
+sample_name = ""
+step_size = 0
+scan_speed = 0
+user_lambda = 0
+B = 0
+filter = 0

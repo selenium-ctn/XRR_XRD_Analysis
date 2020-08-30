@@ -2,7 +2,7 @@ import re
 import numpy as np
 import config
 
-def pull_data(file, pull_vars):
+def pull_data(file):
     """Pulls data from a file that should go into two arrays
 
     file = file to be read 
@@ -19,25 +19,30 @@ def pull_data(file, pull_vars):
             var2 = var2.strip('\n')
             array1.append(float(var1))
             array2.append(float(var2))
-        elif pull_vars:
-            if ";Speed" in line:
-                __, speed = line.split("=")
-                scan_speed = float(speed) 
-                config.scan_speed = scan_speed
-            if "*MEAS_SCAN_SPEED " in line:
-                __, speed = line.split()
-                scan_speed = float(speed.strip("\"")) 
-                config.scan_speed = scan_speed
-            if ";Width" in line:
-                __, width = line.split("=")
-                step_size = float(width) 
-                config.step_size = step_size
-            if "*MEAS_SCAN_STEP " in line:
-                __, width = line.split()
-                step_size = float(width.strip("\"")) 
-                config.step_size = step_size
 
     file.close()
     array1 = np.array(array1)
     array2 = np.array(array2)
     return array1, array2
+
+def pull_vars(file):
+    file = open(file.name)
+    for line in file:
+        if ";Speed" in line:
+            __, speed = line.split("=")
+            scan_speed = float(speed) 
+            config.scan_speed = scan_speed
+        if "*MEAS_SCAN_SPEED " in line:
+            __, speed = line.split()
+            scan_speed = float(speed.strip("\"")) 
+            config.scan_speed = scan_speed
+        if ";Width" in line:
+            __, width = line.split("=")
+            step_size = float(width) 
+            config.step_size = step_size
+        if "*MEAS_SCAN_STEP " in line:
+            __, width = line.split()
+            step_size = float(width.strip("\"")) 
+            config.step_size = step_size
+
+    file.close()
