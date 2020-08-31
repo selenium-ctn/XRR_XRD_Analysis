@@ -17,12 +17,12 @@ import config
 #sample_name = input("Enter sample name ")
  
 #init params  
-sample_name = "testing"
+#sample_name = "testing"
 #step_size = .02
 #scan_speed = .25
-user_lambda = 1.54184 
-B = 10
-filter = 770.53 # or 0 
+#user_lambda = 1.54184 
+#B = 10
+#filter = 770.53 # or 0 
 
 def testprint():
     print(config.sample_name)
@@ -44,7 +44,7 @@ def init_data(zscan, xrr_spec, xrr_bkg):
     bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
 
     #apply filter if necessary 
-    zscan_cps = zscan_cps * filter
+    zscan_cps = zscan_cps * config.filter
     #mult for zscan only!!! maybe don't worry...maybe do....tell user to use automatic filter or nah....
     return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
 
@@ -58,13 +58,13 @@ def zscan_func(zscan_z, zscan_cps):
 
 def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_theta, bkg_cps):
     #specular & background 
-    spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / user_lambda
-    bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / user_lambda
+    spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / config.user_lambda
+    bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / config.user_lambda
     diff_cps = spec_cps - bkg_cps
 
     #geometrical correction
     #account for divide by 0 warning? 
-    gc_cps = (effective_beam_height / ( B * np.sin(np.deg2rad(spec_theta /  2)))) * diff_cps
+    gc_cps = (effective_beam_height / ( config.B * np.sin(np.deg2rad(spec_theta /  2)))) * diff_cps
 
     #take the highest values 
     highest_cps = np.maximum(diff_cps, gc_cps)
@@ -107,7 +107,7 @@ def save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq):
     #write data to text file for motofit to use
     #maybe do a version or hash thing where if there's already a file created, another w/ a diff suffix can be created 
     #choose where to save to?
-    f = open("%s_XRR.txt" % (sample_name), "x")
+    f = open("%s_XRR.txt" % (config.sample_name), "x")
     for (q, r, er) in zip(spec_q[4:], renorm_reflect, renorm_reflect_error):
         f.write('{0} {1} {2} {3}\n'.format(q, r, er, dq))
     f.close()

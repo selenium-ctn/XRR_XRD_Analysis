@@ -112,15 +112,15 @@ class GUI:
 
     def importVars(self):
         XAC.pull_vars(spec)
-        tk_samplename.set(config.sample_name)
         tk_stepsize.set(config.step_size)
         tk_scanspeed.set(config.scan_speed)
-        tk_lambda.set(config.user_lambda)
-        tk_B.set(config.B)
-
 
     def run(self):
         config.sample_name = tk_samplename.get()
+        config.step_size = tk_stepsize.get()
+        config.scan_speed = tk_scanspeed.get()
+        config.user_lambda = tk_lambda.get()
+        config.B = tk_B.get()
         zscan_data, spec_data, bkg_data = XAC.init_data(zscan, spec, bkg)
         stb_inten, effective_beam_height = XAC.zscan_func(zscan_data[0], zscan_data[1])
         renorm_reflect, renorm_reflect_error, dq = XAC.spec_bkg_func(stb_inten, effective_beam_height, spec_data[0], spec_data[1], bkg_data[0], bkg_data[1])

@@ -18,8 +18,8 @@ import config
  
 #init params  
 sample_name = "testing"
-#step_size = .02
-#scan_speed = .25
+step_size = .02
+scan_speed = .25
 user_lambda = 1.54184 
 B = 10
 filter = 770.53 # or 0 
@@ -36,12 +36,9 @@ xrr_bkg = open('ATXG data/BKG_XRR.dat', 'r')
 #zscan = open('Zscan_XRR_0009_Scan2020Feb07-220747.DAT', 'r')
 
 #read files into lists, turn lists into numpy matrices
-zscan_z, zscan_cps = file_reading.pull_data(zscan, False)
-spec_theta, spec_cps = file_reading.pull_data(xrr_spec, True)
-bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg, False)  
-
-step_size = config.step_size
-scan_speed = config.scan_speed 
+zscan_z, zscan_cps = file_reading.pull_data(zscan)
+spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
+bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
 
 #apply filter if necessary 
 #zscan_cps = zscan_cps * filter
