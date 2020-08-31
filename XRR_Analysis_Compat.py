@@ -101,7 +101,7 @@ def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_th
 
     #change location of dq - should probs be in GUI file 
 
-    return renorm_reflect, renorm_reflect_error, dq
+    return spec_q, renorm_reflect, renorm_reflect_error, dq
 
 def save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq):
     #write data to text file for motofit to use

@@ -14,6 +14,7 @@ class GUI:
         global tk_scanspeed
         global tk_lambda 
         global tk_B
+        global tk_filter
         tk_zscan = tk.StringVar()
         tk_spec = tk.StringVar()
         tk_bkg = tk.StringVar()
@@ -21,6 +22,7 @@ class GUI:
         tk_stepsize = tk.DoubleVar()
         tk_scanspeed = tk.DoubleVar()
         tk_lambda = tk.DoubleVar()
+        tk_filter = tk.DoubleVar()
         tk_B = tk.DoubleVar()
         tk_zscan.set("No file chosen")
         tk_spec.set("No file chosen")
@@ -30,6 +32,7 @@ class GUI:
         tk_scanspeed.set(config.scan_speed)
         tk_lambda.set(config.user_lambda)
         tk_B.set(config.B)
+        tk_filter.set(config.filter)
         self.master = master 
         master.title("XRR/XRD Data Reduction")
         tabControl = ttk.Notebook(root)
@@ -90,7 +93,14 @@ class GUI:
         self.entry.grid(row=11, column=1)
         self.label = ttk.Label(xrr_tab, textvariable=tk_B)
         self.label.grid(row=11, column=2)
-        self.button = ttk.Button(text = "Run",command = self.run)
+        self.label = ttk.Label(xrr_tab, text="Filter")
+        self.label.grid(row=12, column=0)
+        filter_options = [0, 770.53]
+        self.menu = ttk.OptionMenu(xrr_tab, tk_filter, filter_options[0], *filter_options)
+        self.menu.grid(row=12, column=1)
+        self.button = ttk.Button(xrr_tab, text = "Run",command = self.run)
+        self.button.grid()
+        self.button = ttk.Button(xrr_tab, text = "Save Motofit File",command = self.save_motofit)
         self.button.grid()
 
     def fileDialogZscan(self):
@@ -116,15 +126,23 @@ class GUI:
         tk_scanspeed.set(config.scan_speed)
 
     def run(self):
+        global spec_q
+        global renorm_reflect
+        global renorm_reflect_error
+        global dq
         config.sample_name = tk_samplename.get()
         config.step_size = tk_stepsize.get()
         config.scan_speed = tk_scanspeed.get()
         config.user_lambda = tk_lambda.get()
         config.B = tk_B.get()
+        config.filter = tk_filter.get()
         zscan_data, spec_data, bkg_data = XAC.init_data(zscan, spec, bkg)
         stb_inten, effective_beam_height = XAC.zscan_func(zscan_data[0], zscan_data[1])
-        renorm_reflect, renorm_reflect_error, dq = XAC.spec_bkg_func(stb_inten, effective_beam_height, spec_data[0], spec_data[1], bkg_data[0], bkg_data[1])
-        print(renorm_reflect)
+        spec_q, renorm_reflect, renorm_reflect_error, dq = XAC.spec_bkg_func(stb_inten, effective_beam_height, spec_data[0], spec_data[1], bkg_data[0], bkg_data[1])
+        print(spec_q)
+    
+    def save_motofit(self):
+        XAC.save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq)
 
 
 root = tk.Tk()
