@@ -124,6 +124,7 @@ def find_bragg_peak_alt(q, cps):
     #find the peaks (maxima) in the original data (reflectivity). Use cwt because of the possible noise. orig_peaks = array of positions,
     #referring to positions in the cps array where the peaks are located 
     orig_peaks = find_peaks_cwt(cps, np.linspace(1, 20, num=50))
+    #orig_peaks = find_peaks_cwt(cps, np.linspace(1, 10, num=50))
 
     #find the peaks (maxima) in the first derivative of the reflectivity data. Use cwt because of the possible noise. peaks_1d = array of 
     #positions, referring to positions in the first_deriv array where the peaks are located 
@@ -161,42 +162,52 @@ def find_bragg_peak_alt(q, cps):
     orig_peaks_pos_2 = orig_peaks[loc_max_p2]
 
     #find the positions of the peaks directly preceeding the highest and second highest peaks in the original data
-    prev_peak_1_pos = orig_peaks[loc_max_p1[0] - 1]
-    prev_peak_2_pos = orig_peaks[loc_max_p2[0] - 1]
+
+    if loc_max_p1[0] != 0:
+        prev_peak_1_pos = orig_peaks[loc_max_p1[0] - 1]
+    else: 
+        prev_peak_1_pos = 0
+
+    if loc_max_p2[0] != 0:
+        prev_peak_2_pos = orig_peaks[loc_max_p2[0] - 1]
+    else: 
+        prev_peak_2_pos = 0
 
     #confirm that both of the highest peaks found in the first derivative correspond to the highest peaks in the original data.
     #do this by seeing if the q values of the first derivative peaks fall between the q value of the peak and its preceeding peak
     #peaks in the first derivative correspond will always correspond to a point on the original data peak before (to the right of) the 
     #highest point of the peak 
-    if q[peaks_1d_pos_1] < q[orig_peaks_pos_1] and q[peaks_1d_pos_1] > q[prev_peak_1_pos]:
-        bragg_peak_possibility_1 = peaks_1d_pos_1
-    elif q[peaks_1d_pos_1] < q[orig_peaks_pos_2] and q[peaks_1d_pos_1] > q[prev_peak_2_pos]:
-        bragg_peak_possibility_1 = peaks_1d_pos_1
-    else: bragg_peak_possibility_1 = None
 
-    if q[peaks_1d_pos_2] < q[orig_peaks_pos_2] and q[peaks_1d_pos_2] > q[prev_peak_2_pos]:
-        bragg_peak_possibility_2 = peaks_1d_pos_2
-    elif q[peaks_1d_pos_2] < q[orig_peaks_pos_1] and q[peaks_1d_pos_2] > q[prev_peak_1_pos]:
-            bragg_peak_possibility_2 = peaks_1d_pos_2
-    else: bragg_peak_possibility_2 = None
+    bragg_peak_possibility_1 = None
+    bragg_peak_possibility_2 = None
+
+    i = 0 
+    for peak in peaks_1d:
+        if peak <= orig_peaks_pos_1 and peak >= prev_peak_1_pos:
+            bragg_peak_possibility_1 = peak 
+            possibility_pos_1 = i
+        if peak <= orig_peaks_pos_2 and peak >= prev_peak_2_pos:
+            bragg_peak_possibility_2 = peak 
+            possibility_pos_2 = i 
+        i += 1
 
     #if both peaks correspond correctly (the substrate peak may or may not register as a highest 1st derivative peak), compare the widths
     #of the peaks in the first derivative. The bragg peak will be the one that is wider
     if bragg_peak_possibility_1 != None and bragg_peak_possibility_2 != None:
         #needs testing...didn't get tested bc substrate peak did not register 
-        if widths[loc_max_pos_1] > widths[loc_max_pos_2]:
-            bragg_peak_1d = loc_max_pos_1
+        if widths[possibility_pos_1] > widths[possibility_pos_2]:
+            bragg_peak_1d = possibility_pos_1
         else:
-            bragg_peak_1d = loc_max_pos_2
+            bragg_peak_1d = possibility_pos_2
     elif bragg_peak_possibility_1 != None:
-        bragg_peak_1d = loc_max_pos_1
+        bragg_peak_1d = possibility_pos_1
     elif bragg_peak_possibility_2 != None:
-        bragg_peak_1d = loc_max_pos_2
+        bragg_peak_1d = possibility_pos_2
 
     #adjust for the fact that the widths will sometimes surpass the 0 mark in the first derivative. 
-    if first_deriv[left_ips[bragg_peak_1d].astype(np.int)] < 0:
-        curr_index = left_ips[bragg_peak_1d].astype(np.int)
-        adjust = 0 
+    curr_index = left_ips[bragg_peak_1d].astype(np.int)
+    adjust = 0 
+    if first_deriv[curr_index] < 0:
         while first_deriv[curr_index] < 0:
             curr_index = curr_index + 1
             adjust = adjust + 1
@@ -213,6 +224,7 @@ def find_bragg_peak_alt(q, cps):
     plt.plot(q, first_deriv)
     plt.plot(q[peaks_1d], first_deriv[peaks_1d], "x")
     plt.hlines(width_heights, q[left_ips.astype(np.int)], q[right_ips.astype(np.int)])
+    plt.show()
 
     return curr_index, (right_ips[bragg_peak_1d] - adjust + widths[bragg_peak_1d]).astype(np.int)
 

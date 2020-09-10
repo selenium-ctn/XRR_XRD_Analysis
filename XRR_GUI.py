@@ -3,6 +3,11 @@ from tkinter import ttk
 from tkinter import filedialog, LabelFrame
 import XRR_Analysis_Compat as XAC 
 import config
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
+import numpy as np
 
 class GUI:
     def __init__(self, master):
@@ -95,7 +100,7 @@ class GUI:
         self.label.grid(row=11, column=2)
         self.label = ttk.Label(xrr_tab, text="Filter")
         self.label.grid(row=12, column=0)
-        filter_options = [0, 770.53]
+        filter_options = [0, 770.53] 
         self.menu = ttk.OptionMenu(xrr_tab, tk_filter, filter_options[0], *filter_options)
         self.menu.grid(row=12, column=1)
         self.button = ttk.Button(xrr_tab, text = "Run",command = self.run)
@@ -137,8 +142,27 @@ class GUI:
         config.B = tk_B.get()
         config.filter = tk_filter.get()
         zscan_data, spec_data, bkg_data = XAC.init_data(zscan, spec, bkg)
-        stb_inten, effective_beam_height = XAC.zscan_func(zscan_data[0], zscan_data[1])
-        spec_q, renorm_reflect, renorm_reflect_error, dq = XAC.spec_bkg_func(stb_inten, effective_beam_height, spec_data[0], spec_data[1], bkg_data[0], bkg_data[1])
+        stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XAC.zscan_func(zscan_data[0], zscan_data[1])
+        """
+        fig = Figure(figsize = (5, 5), dpi = 100)
+        plot1 = fig.add_subplot(111)
+        plot1.plot(zscan_data[0], zscan_data[1])
+        plot1.vlines(z_1, 0, stb, linestyles='dashed')
+        plot1.vlines(z_2, 0, stb, linestyles='dashed')
+        plot1.hlines(stb, zscan_data[0][0], z_1, color="black")
+        plot1.hlines(0, z_2, zscan_data[0][zscan_data[0].size - 1], color="black")
+        plot1.plot(reduced_z, inter + slope * reduced_z)
+        #plot1.xlabel("z (mm)")
+        #plot1.ylabel("cps")
+        #plot1.title("zscan")
+        canvas = FigureCanvasTkAgg(fig, master=master)
+        canvas.draw()
+        canvas.get_tk_widget().grid()
+        toolbar = NavigationToolbar2Tk(canvas, master)
+        toolbar.update()
+        canvas.get_tk_widget().grid()
+        """
+        spec_q, renorm_reflect, renorm_reflect_error, dq = XAC.spec_bkg_func(stb, effective_beam_height, spec_data[0], spec_data[1], bkg_data[0], bkg_data[1])
         print(spec_q)
     
     def save_motofit(self):

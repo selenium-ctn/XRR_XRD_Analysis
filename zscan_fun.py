@@ -90,5 +90,5 @@ def stb_intensity_and_eff_beam_height(z, cps):
     plt.ylabel("cps")
     plt.title("zscan")
 
-    return stb, abs(z_1 - z_2)
+    return stb, abs(z_1 - z_2), z_1, z_2, reduced_z, inter, slope
         

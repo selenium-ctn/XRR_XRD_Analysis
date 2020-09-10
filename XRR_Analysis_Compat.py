@@ -53,8 +53,8 @@ def pull_vars(file):
 
 def zscan_func(zscan_z, zscan_cps):
     #get the effective beam height, STB intensity 
-    stb_inten, effective_beam_height = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps) 
-    return stb_inten, effective_beam_height
+    stb_inten, effective_beam_height, z_1, z_2, reduced_z, inter, slope = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps) 
+    return stb_inten, effective_beam_height, z_1, z_2, reduced_z, inter, slope
 
 def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_theta, bkg_cps):
     #specular & background 
