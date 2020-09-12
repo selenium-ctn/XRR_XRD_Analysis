@@ -91,7 +91,7 @@ def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_th
     plt.ylabel("Reflectivity")
     plt.title("q vs Reflectivity")
     plt.yscale("log")
-    plt.show()
+    #plt.show()
 
     #exclude first 5 data points (creates a less messy file for motofit). renormalize reflectivity w/ the highest value. 
     #calculate the renormalized reflectivity error. 
