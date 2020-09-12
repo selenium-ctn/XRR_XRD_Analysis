@@ -71,6 +71,7 @@ def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_th
 
     #normalize by stb intensity
     norm_reflectivity = highest_cps / stb_inten
+    orig_norm_reflectivity = norm_reflectivity
 
     #compute error bars 
     error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed) + (bkg_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
@@ -101,7 +102,7 @@ def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_th
 
     #change location of dq - should probs be in GUI file 
 
-    return spec_q, renorm_reflect, renorm_reflect_error, dq
+    return spec_q, renorm_reflect, renorm_reflect_error, dq, error_bars, orig_norm_reflectivity
 
 def save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq):
     #write data to text file for motofit to use
