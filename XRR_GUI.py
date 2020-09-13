@@ -146,12 +146,14 @@ class GUI:
         config.filter = tk_filter.get()
         zscan_data, spec_data, bkg_data = XAC.init_data(zscan, spec, bkg)
         stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XAC.zscan_func(zscan_data[0], zscan_data[1])
-        try: 
-            canvas.get_tk_widget().destroy()
-        except:
-            pass        
+        #try: 
+        #    canvas.get_tk_widget().destroy()
+        #except:
+        #    pass        
         fig = Figure(figsize = (6, 4), dpi = 100)
-        plot1 = fig.add_subplot(111)
+        #fig.set_figheight(4)
+        #fig.set_figwidth(5)
+        plot1 = fig.add_subplot(9, 1, (1,8))
         plot1.plot(zscan_data[0], zscan_data[1])
         plot1.vlines(z_1, 0, stb, linestyles='dashed')
         plot1.vlines(z_2, 0, stb, linestyles='dashed')
@@ -164,23 +166,24 @@ class GUI:
         canvas.draw()
         canvas.get_tk_widget().grid(column=3, row=1, rowspan=11)
         toolbarFrame = ttk.Frame(master=self.xrr_tab)
-        toolbarFrame.grid(row=13, column=3)
+        toolbarFrame.grid(row=12, column=3, padx=0, pady=0)
         toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
         toolbar.update()
-        canvas.get_tk_widget().grid(column=3, row=13)
         spec_q, renorm_reflect, renorm_reflect_error, dq, error_bars, orig_norm_reflectivity = XAC.spec_bkg_func(stb, effective_beam_height, spec_data[0], spec_data[1], bkg_data[0], bkg_data[1])
         print(spec_q)
         fig2 = Figure(figsize=(6, 4), dpi = 100)
-        plot2 = fig2.add_subplot(111)
-        plot2.errorbar(spec_q[2:], orig_norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red', fmt='-o')
+        plot2 = fig2.add_subplot(9, 1, (1,8))
+        plot2.errorbar(spec_q[2:], orig_norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')
         plot2.set(xlabel=r'q ($\mathrm{\AA}$)', ylabel="Reflectivity")
         plot2.set_title("q vs Reflectivity")
         plot2.set_yscale("log")
         canvas2 = FigureCanvasTkAgg(fig2, master=self.xrr_tab)
         canvas2.draw()
         canvas2.get_tk_widget().grid(column=3, row=14, rowspan=11)
-        #toolbarFrame2 = ttk.Frame(master=self.xrr_tab)
-        #toolbarFrame2.grid(row=26, column=3)
+        toolbarFrame2 = ttk.Frame(master=self.xrr_tab)
+        toolbarFrame2.grid(row=26, column=3)
+        toolbar2 = NavigationToolbar2Tk(canvas2, toolbarFrame2)
+        toolbar2.update()
 
     def save_motofit(self):
         XAC.save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq)
