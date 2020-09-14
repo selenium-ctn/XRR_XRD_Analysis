@@ -75,42 +75,31 @@ class GUI:
         self.label.grid(row=7, column=0)
         self.entry = ttk.Entry(xrr_tab, textvariable=tk_samplename)
         self.entry.grid(row=7, column=1)
-        self.label = ttk.Label(xrr_tab, textvariable=tk_samplename)
-        self.label.grid(row=7, column=2)
         self.label = ttk.Label(xrr_tab, text="Step size")
         self.label.grid(row=8, column=0)
         self.entry = ttk.Entry(xrr_tab, textvariable=tk_stepsize)
         self.entry.grid(row=8, column=1)
-        self.label = ttk.Label(xrr_tab, textvariable=tk_stepsize)
-        self.label.grid(row=8, column=2)
         self.label = ttk.Label(xrr_tab, text="Scan speed")
         self.label.grid(row=9, column=0)
         self.entry = ttk.Entry(xrr_tab, textvariable=tk_scanspeed)
         self.entry.grid(row=9, column=1)
-        self.label = ttk.Label(xrr_tab, textvariable=tk_scanspeed)
-        self.label.grid(row=9, column=2)
         self.label = ttk.Label(xrr_tab, text="Lambda")
         self.label.grid(row=10, column=0)
-        self.entry = ttk.Entry(xrr_tab, textvariable=tk_lambda)
-        self.entry.grid(row=10, column=1)
-        self.label = ttk.Label(xrr_tab, textvariable=tk_lambda)
-        self.label.grid(row=10, column=2)
-        self.label = ttk.Label(xrr_tab, text="B")
+        self.combobox = ttk.Combobox(xrr_tab, textvariable=tk_lambda, values=[1.540562, 1.54184])
+        self.combobox.grid(row=10, column=1)
+        self.label = ttk.Label(xrr_tab, text="Sample Length")
         self.label.grid(row=11, column=0)
         self.entry = ttk.Entry(xrr_tab, textvariable=tk_B)
         self.entry.grid(row=11, column=1)
-        self.label = ttk.Label(xrr_tab, textvariable=tk_B)
-        self.label.grid(row=11, column=2)
         self.label = ttk.Label(xrr_tab, text="Filter")
         self.label.grid(row=12, column=0)
-        filter_options = [0, 770.53] 
-        self.menu = ttk.OptionMenu(xrr_tab, tk_filter, filter_options[0], *filter_options)
-        self.menu.grid(row=12, column=1)
+        self.combobox = ttk.Combobox(xrr_tab, textvariable=tk_filter, values=[0, 770.53])
+        self.combobox.grid(row=12, column=1)
         self.button = ttk.Button(xrr_tab, text = "Run",command = self.run)
         self.button.grid()
         self.button = ttk.Button(xrr_tab, text = "Save Motofit File",command = self.save_motofit)
         self.button.grid()
-
+        
     def fileDialogZscan(self):
         global zscan
         zscan = filedialog.askopenfile(initialdir = "/", title="Select zscan file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
@@ -187,7 +176,6 @@ class GUI:
 
     def save_motofit(self):
         XAC.save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq)
-
 
 root = tk.Tk()
 gui = GUI(root)
