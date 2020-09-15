@@ -99,7 +99,7 @@ class GUI:
         self.button.grid()
         self.button = ttk.Button(xrr_tab, text = "Save Motofit File",command = self.save_motofit)
         self.button.grid()
-        
+
     def fileDialogZscan(self):
         global zscan
         zscan = filedialog.askopenfile(initialdir = "/", title="Select zscan file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
@@ -140,8 +140,6 @@ class GUI:
         #except:
         #    pass        
         fig = Figure(figsize = (6, 4), dpi = 100)
-        #fig.set_figheight(4)
-        #fig.set_figwidth(5)
         plot1 = fig.add_subplot(9, 1, (1,8))
         plot1.plot(zscan_data[0], zscan_data[1])
         plot1.vlines(z_1, 0, stb, linestyles='dashed')
@@ -159,7 +157,6 @@ class GUI:
         toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
         toolbar.update()
         spec_q, renorm_reflect, renorm_reflect_error, dq, error_bars, orig_norm_reflectivity = XAC.spec_bkg_func(stb, effective_beam_height, spec_data[0], spec_data[1], bkg_data[0], bkg_data[1])
-        print(spec_q)
         fig2 = Figure(figsize=(6, 4), dpi = 100)
         plot2 = fig2.add_subplot(9, 1, (1,8))
         plot2.errorbar(spec_q[2:], orig_norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')

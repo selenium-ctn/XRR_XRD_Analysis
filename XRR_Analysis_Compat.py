@@ -77,20 +77,20 @@ def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_th
     error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed) + (bkg_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
 
     #plot q vs reflectivity 
-    plt.figure()
-    plt.plot(spec_q, norm_reflectivity)
-    plt.yscale("log")
-    plt.xlabel(r'q ($\mathrm{\AA}$)')
-    plt.ylabel("Reflectivity")
-    plt.title("q vs Reflectivity")
+    #plt.figure()
+    #plt.plot(spec_q, norm_reflectivity)
+    #plt.yscale("log")
+    #plt.xlabel(r'q ($\mathrm{\AA}$)')
+    #plt.ylabel("Reflectivity")
+    #plt.title("q vs Reflectivity")
 
     #plot q vs reflectivity with error bars 
-    plt.figure()
-    plt.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')
-    plt.xlabel(r'q ($\mathrm{\AA}$)')
-    plt.ylabel("Reflectivity")
-    plt.title("q vs Reflectivity")
-    plt.yscale("log")
+    #plt.figure()
+    #plt.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')
+    #plt.xlabel(r'q ($\mathrm{\AA}$)')
+    #plt.ylabel("Reflectivity")
+    #plt.title("q vs Reflectivity")
+    #plt.yscale("log")
     #plt.show()
 
     #exclude first 5 data points (creates a less messy file for motofit). renormalize reflectivity w/ the highest value. 
