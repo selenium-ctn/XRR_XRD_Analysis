@@ -28,16 +28,6 @@ def testprint():
     print(config.sample_name)
 
 def init_data(zscan, xrr_spec, xrr_bkg):
-    #open files 
-    zscan = open('ATXG data/Zscan.dat', 'r')
-    xrr_spec = open('ATXG data/spec_XRR.dat', 'r')
-    xrr_bkg = open('ATXG data/BKG_XRR.dat', 'r')    
-
-    #zscan = open('Smartlab data/Zscan_0007_Scan2020Jan23-191605.dat', 'r')
-    #zscan = open('Zscan_1.DAT', 'r')
-    #zscan = open('Zscan_2.DAT', 'r')
-    #zscan = open('Zscan_XRR_0009_Scan2020Feb07-220747.DAT', 'r')
-
     #read files into lists, turn lists into numpy matrices
     zscan_z, zscan_cps = file_reading.pull_data(zscan)
     spec_theta, spec_cps = file_reading.pull_data(xrr_spec)

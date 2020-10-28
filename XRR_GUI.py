@@ -134,11 +134,11 @@ class GUI:
         config.B = tk_B.get()
         config.filter = tk_filter.get()
         zscan_data, spec_data, bkg_data = XAC.init_data(zscan, spec, bkg)
-        stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XAC.zscan_func(zscan_data[0], zscan_data[1])
-        #try: 
-        #    canvas.get_tk_widget().destroy()
-        #except:
-        #    pass        
+        print(zscan_data)
+        stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XAC.zscan_func(zscan_data[0], zscan_data[1])      
+        zscan_plot_str = '\n'.join((
+            r'eff beam height=%.2f mm' % (effective_beam_height, ),
+            r'STB=%.2f cps' % (stb, )))
         fig = Figure(figsize = (6, 4), dpi = 100)
         plot1 = fig.add_subplot(9, 1, (1,8))
         plot1.plot(zscan_data[0], zscan_data[1])
@@ -149,9 +149,11 @@ class GUI:
         plot1.plot(reduced_z, inter + slope * reduced_z)
         plot1.set(xlabel="z (mm)", ylabel="cps")
         plot1.set_title("zscan")
+        plot1.text(0.65, 0.95, zscan_plot_str, transform=plot1.transAxes, fontsize=8, verticalalignment='top')
         canvas = FigureCanvasTkAgg(fig, master=self.xrr_tab)
         canvas.draw()
         canvas.get_tk_widget().grid(column=3, row=1, rowspan=11)
+        print(stb)
         toolbarFrame = ttk.Frame(master=self.xrr_tab)
         toolbarFrame.grid(row=12, column=3, padx=0, pady=0)
         toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
