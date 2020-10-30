@@ -34,7 +34,8 @@ def init_data(zscan, xrr_spec, xrr_bkg):
     bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
 
     #apply filter if necessary 
-    zscan_cps = zscan_cps * config.filter
+    if config.filter != 0: 
+        zscan_cps = zscan_cps * config.filter
     #mult for zscan only!!! maybe don't worry...maybe do....tell user to use automatic filter or nah....
     return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
 
