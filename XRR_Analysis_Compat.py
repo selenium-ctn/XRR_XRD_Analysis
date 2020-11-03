@@ -95,11 +95,11 @@ def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_th
 
     return spec_q, renorm_reflect, renorm_reflect_error, dq, error_bars, orig_norm_reflectivity
 
-def save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq):
+def save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq, f):
     #write data to text file for motofit to use
     #maybe do a version or hash thing where if there's already a file created, another w/ a diff suffix can be created 
     #choose where to save to?
-    f = open("%s_XRR.txt" % (config.sample_name), "x")
+    #f = open("%s_XRR.txt" % (config.sample_name), "x")
     for (q, r, er) in zip(spec_q[4:], renorm_reflect, renorm_reflect_error):
         f.write('{0} {1} {2} {3}\n'.format(q, r, er, dq))
     f.close()

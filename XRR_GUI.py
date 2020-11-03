@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog, LabelFrame
+from tkinter.filedialog import asksaveasfile
 import XRR_Analysis_Compat as XAC 
 import config
 from matplotlib.backends.backend_tkagg import (
@@ -174,7 +175,10 @@ class GUI:
         toolbar2.update()
 
     def save_motofit(self):
-        XAC.save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq)
+        f = asksaveasfile(mode='w', defaultextension=".txt", initialfile="%s_XRR.txt" % (config.sample_name))
+        if f is None:
+            return 
+        XAC.save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq, f)
 
 root = tk.Tk()
 gui = GUI(root)
