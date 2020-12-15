@@ -18,24 +18,24 @@ spec_res = 0
 rocking_res = 0 
 
 zscan = open('Smartlab data/Zscan_0007_Scan2020Jan23-191605.dat', 'r')
-#xrr_spec = open('Smartlab data/spec2Pt111_Al2O3_006_1.dat', 'r')
-#xrr_bkg = open('Smartlab data/bkg2Pt111_Al2O3_006.dat', 'r')
-rocking = open('Smartlab data/RC_Pt_111_0013_Scan2020Jan23-194300_1.dat', 'r')
+xrr_spec = open('Smartlab data/spec2Pt111_Al2O3_006_1.dat', 'r')
+xrr_bkg = open('Smartlab data/bkg2Pt111_Al2O3_006.dat', 'r')
+#rocking = open('Smartlab data/RC_Pt_111_0013_Scan2020Jan23-194300_1.dat', 'r')
 
 #xrr_spec = open('Smartlab data/2theta_Al2O3_0016_Scan2020Jan23-192933.dat', 'r')
 #rocking = open('Smartlab data/RC_Al2O3_0010_Scan2020Jan23-193141.dat', 'r')
 
-xrr_spec = open('C:/Users/selin/Downloads/2020_8_21_DATAFILES/2020_8_21_DATAFILES/PLD02112020_MoO2/2TW_MoO2_200_0013_Scan2020Jul18-192754.txt', 'r')
-xrr_bkg = open('C:/Users/selin/Downloads/2020_8_21_DATAFILES/2020_8_21_DATAFILES/PLD02112020_MoO2/2TW_BKG_MoO2_200_0014_Scan2020Jul18-193932.txt', 'r')
+#xrr_spec = open('C:/Users/selin/Downloads/2020_8_21_DATAFILES/2020_8_21_DATAFILES/PLD02112020_MoO2/2TW_MoO2_200_0013_Scan2020Jul18-192754.txt', 'r')
+#xrr_bkg = open('C:/Users/selin/Downloads/2020_8_21_DATAFILES/2020_8_21_DATAFILES/PLD02112020_MoO2/2TW_BKG_MoO2_200_0014_Scan2020Jul18-193932.txt', 'r')
 
 # read files into lists, turn lists into numpy matrices
 zscan_z, zscan_cps = file_reading.pull_data(zscan)
 spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
 bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
-rock_theta, rock_cps = file_reading.pull_data(rocking) #maybe I should change theta on spec and bkg to 2theta for clarity 
+#rock_theta, rock_cps = file_reading.pull_data(rocking) #maybe I should change theta on spec and bkg to 2theta for clarity 
 
 #get the effective beam height, STB intensity 
-stb_inten, effective_beam_height = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps)
+stb_inten, effective_beam_height,_,_,_,_,_ = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps)
 
 #Specular & background 
 spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / user_lambda
@@ -49,11 +49,16 @@ norm_reflectivity = diff_cps / stb_inten
 error_bars = np.sqrt((spec_cps * step_size * 60 / scan_speed) + (bkg_cps * step_size * 60 / scan_speed)) / stb_inten
 
 #find the start and end indices of the bragg peak
+
+#testing 
+bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak_user_assist(spec_q, norm_reflectivity)
+
+#bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak_alt(spec_q, norm_reflectivity)
+
 #bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak(spec_q, norm_reflectivity)
-bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak_alt(spec_q, norm_reflectivity)
 #bragg_start_ind, bragg_end_ind = XRD_fun.find_bragg_peak_rc(spec_q, norm_reflectivity)
-bragg_start_ind = bragg_start_ind[0]
-bragg_end_ind = bragg_end_ind[0]
+#bragg_start_ind = bragg_start_ind[0]
+#bragg_end_ind = bragg_end_ind[0]
 
 #reduce the data to only the bragg peak -- this is the data to be used when Gaussian fitting the bragg peak 
 bragg_refl = norm_reflectivity[bragg_start_ind:bragg_end_ind]

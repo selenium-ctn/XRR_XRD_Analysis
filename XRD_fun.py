@@ -1,4 +1,4 @@
-from scipy.signal import argrelextrema, find_peaks, peak_prominences, find_peaks_cwt, peak_widths
+from scipy.signal import argrelextrema, find_peaks, peak_prominences, find_peaks_cwt, peak_widths, savgol_filter
 import heapq 
 import numpy as np
 from math import pi
@@ -253,4 +253,78 @@ def find_bragg_peak_rc(q, cps):
     peaks_pos_1 = orig_peaks[loc_max_pos_1]
 
     return left_ips[loc_max_pos_1].astype(np.int), right_ips[loc_max_pos_1].astype(np.int)
+
+def find_bragg_peak_user_assist(q, cps):
+    #not sure how big I should make the widths....ask Carlos about max bragg peak sizes
+    #remove NaN?
+    #find the peaks (maxima) in the original data (reflectivity). Use cwt because of the possible noise. orig_peaks = array of positions,
+    #referring to positions in the cps array where the peaks are located 
+    orig_peaks = find_peaks_cwt(cps, np.linspace(1, 20, num=50))
+    #orig_peaks = find_peaks_cwt(cps, np.linspace(1, 10, num=50))
+
+    #find three largest peaks (bragg, substrate, and one extra just in case). Ask user which one is bragg 
+    loc_max_v = cps[orig_peaks]
+    max3vals = heapq.nlargest(3, loc_max_v)
+    loc_max_p1 = np.where(loc_max_v == max3vals[0])
+    orig_peaks_pos_1 = orig_peaks[loc_max_p1]
+    loc_max_p2 = np.where(loc_max_v == max3vals[1])
+    orig_peaks_pos_2 = orig_peaks[loc_max_p2]
+    loc_max_p3 = np.where(loc_max_v == max3vals[2])
+    orig_peaks_pos_3 = orig_peaks[loc_max_p3]
+
+    plt.figure()
+    plt.plot(q, cps)
+    plt.plot(q[orig_peaks_pos_1], cps[orig_peaks_pos_1], "x")
+    plt.plot(q[orig_peaks_pos_2], cps[orig_peaks_pos_2], "^")
+    plt.plot(q[orig_peaks_pos_3], cps[orig_peaks_pos_3], "*")
+    plt.yscale("log")
+    plt.show()
+    print(f"peak 1 (x) position: {orig_peaks_pos_1}, peak 2 (tri) position: {orig_peaks_pos_2}, peak 3 (star) position: {orig_peaks_pos_3}")
+    peak_num = input("Enter peak number ")
+    #to be replaced in tkinter 
+    if peak_num == "1":
+        pn = orig_peaks_pos_1
+    elif peak_num == "2":
+        pn = orig_peaks_pos_2
+    elif peak_num == "3":
+        pn == orig_peaks_pos_3
+
+    #find the peaks (maxima) in the first derivative of the reflectivity data. Use cwt because of the possible noise. peaks_1d = array of 
+    #positions, referring to positions in the first_deriv array where the peaks are located (indices)
+    first_deriv = np.gradient(cps, q)
+    peaks_1d =  find_peaks_cwt(first_deriv, np.linspace(1, 10, num=50))
+    #peaks_1d =  find_peaks_cwt(first_deriv, np.linspace(1, 2, num=50))
+
+    #find which peak is closest to the peak in the original data 
+    curr_diff = 10000000
+    closest_peak = 0 
+    p_ind = 0 
+    pc = 0 
+    for peak in peaks_1d:
+        if abs(q[peak] - q[pn]) < curr_diff:
+            curr_diff = abs(q[peak] - q[pn])
+            closest_peak = peak
+            p_ind = pc
+        pc = pc + 1
+
+    #find the widths (and other associtated values) of the peaks in the first dervative. This is more accurate than finding the widths of the peaks in the original 
+    #data. rel_height=1 means the left and right bases are being found at the lowest contour lines of the peak  
+    widths, width_heights, left_ips, right_ips = peak_widths(first_deriv, peaks_1d, rel_height=1)
+    print(peaks_1d)
+    print(widths)
+
+    #adjust for the fact that the widths will sometimes surpass the 0 mark in the first derivative. 
+    curr_index = left_ips[p_ind].astype(np.int)
+    adjust = 0 
+    if first_deriv[curr_index] < 0:
+        while first_deriv[curr_index] < 0:
+            curr_index = curr_index + 1
+            adjust = adjust + 1
+
+    plt.figure()
+    plt.plot(q, first_deriv)
+    plt.hlines(width_heights[p_ind], q[curr_index], q[(right_ips[p_ind] - adjust + widths[p_ind]).astype(np.int)])
+    plt.show()
     
+    print(curr_index, (right_ips[p_ind] - adjust + widths[p_ind]).astype(np.int))
+    return curr_index, (right_ips[p_ind] - adjust + widths[p_ind]).astype(np.int)
