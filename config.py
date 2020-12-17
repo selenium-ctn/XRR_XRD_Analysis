@@ -4,3 +4,5 @@ scan_speed = 0
 user_lambda = 0
 B = 0
 filter = 0
+spec_res = 0 
+rock_res = 0 
