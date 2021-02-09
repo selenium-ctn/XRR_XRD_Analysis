@@ -16,6 +16,7 @@ def init_data(zscan=0, xrd_spec=0, xrd_bkg=0):
     if zscan !=0:
         zscan_z, zscan_cps = file_reading.pull_data(zscan)
     else:
+        config.xrd_no_zscan = 1
         zscan_z = []
         zscan_cps = [] 
     if xrd_spec !=0:
@@ -23,10 +24,12 @@ def init_data(zscan=0, xrd_spec=0, xrd_bkg=0):
     if xrd_bkg != 0:
         bkg_theta, bkg_cps = file_reading.pull_data(xrd_bkg) 
     else:
+        config.xrd_no_bkg = 1
         bkg_theta = []
         bkg_cps = []
     return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
 
+"""
 def init_data_without_bkg(zscan, xrd_spec):
     # read files into lists, turn lists into numpy matrices
     zscan_z, zscan_cps = file_reading.pull_data(zscan)
@@ -35,6 +38,7 @@ def init_data_without_bkg(zscan, xrd_spec):
     bkg_theta = []
     bkg_cps = []
     return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
+"""
 
 #def pull_vars():
 
@@ -58,7 +62,10 @@ def plot_XRD_data(spec_theta, bkg_theta, spec_cps, bkg_cps, stb_inten):
     norm_reflectivity = diff_cps / stb_inten
 
     #compute error bars 
-    error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed) + (bkg_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
+    if config.xrd_no_bkg == 0:
+        error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed) + (bkg_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
+    else:
+        error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
 
     return spec_q, norm_reflectivity, error_bars
 

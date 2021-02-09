@@ -7,4 +7,5 @@ filter = 1.000000
 spec_res = 0.0
 rock_res = 0.0
 xrd_no_bkg = 0 
+xrd_no_zscan = 0
 stb = 0.0 

@@ -268,7 +268,7 @@ class GUI:
                 zscan_data, spec_data, bkg_data = XDAC.init_data(zscan=zscan, xrd_spec=spec)
             else:
                 zscan_data, spec_data, bkg_data = XDAC.init_data(zscan=zscan, xrd_spec=spec, xrd_bkg=bkg)
-        if tk_stb.get() == 0.0:
+        if config.xrd_no_zscan == 0:
             stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XDAC.zscan_func(zscan_data[0], zscan_data[1])      
             zscan_plot_str = '\n'.join((
                 r'eff beam height=%.2f mm' % (effective_beam_height, ),
