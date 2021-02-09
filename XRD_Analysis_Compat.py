@@ -11,12 +11,18 @@ import XRD_fun
 from scipy.optimize import curve_fit
 import config
 
-def init_data_with_bkg(zscan, xrr_spec, xrr_bkg):
+def init_data_with_bkg(zscan, xrd_spec, xrd_bkg):
     # read files into lists, turn lists into numpy matrices
     zscan_z, zscan_cps = file_reading.pull_data(zscan)
-    spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
-    bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
-
+    spec_theta, spec_cps = file_reading.pull_data(xrd_spec)
+    try:
+        xrd_bkg 
+    except: 
+        config.xrd_no_bkg = 1 
+        bkg_theta = []
+        bkg_cps = []
+    else: 
+        bkg_theta, bkg_cps = file_reading.pull_data(xrd_bkg) 
     return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
 
 #def pull_vars():
@@ -25,6 +31,25 @@ def zscan_func(zscan_z, zscan_cps):
     #get the effective beam height, STB intensity 
     stb_inten, effective_beam_height, z_1, z_2, reduced_z, inter, slope = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps) 
     return stb_inten, effective_beam_height, z_1, z_2, reduced_z, inter, slope
+
+def plot_XRD_data(spec_theta, bkg_theta, spec_cps, bkg_cps, stb_inten):
+    #Specular & background 
+    spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / config.user_lambda
+    if config.xrd_no_bkg == 0:
+        bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / config.user_lambda
+
+    #difference between specular cps and background cps; normalize by STB intensity 
+    if config.xrd_no_bkg == 0:
+        diff_cps = spec_cps - bkg_cps
+    else:
+        diff_cps = spec_cps 
+
+    norm_reflectivity = diff_cps / stb_inten
+
+    #compute error bars 
+    error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed) + (bkg_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
+
+    return spec_q, norm_reflectivity, error_bars
 
 def bragg_peak_analysis_with_bkg(spec_theta, bkg_theta, spec_cps, bkg_cps, stb_inten):
     #Specular & background 

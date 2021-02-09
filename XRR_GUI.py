@@ -100,7 +100,7 @@ class GUI:
         self.entry.grid(row=11, column=1)
         self.label = ttk.Label(xrr_tab, text="Filter")
         self.label.grid(row=12, column=0)
-        self.combobox = ttk.Combobox(xrr_tab, textvariable=tk_filter, values=[0, 770.53])
+        self.combobox = ttk.Combobox(xrr_tab, textvariable=tk_filter, values=[1.000000, 1.880281, 11.357267, 124.334029, 770.532653])
         self.combobox.grid(row=12, column=1)
         self.button = ttk.Button(xrr_tab, text = "Run",command = self.run)
         self.button.grid()
@@ -149,9 +149,9 @@ class GUI:
         self.label.grid(row=12, column=0)
         self.entry = ttk.Entry(xrd_tab, textvariable=tk_rock_res)
         self.entry.grid(row=12, column=1)
-        self.button = ttk.Button(xrr_tab, text = "Run",command = self.run)
+        self.button = ttk.Button(xrd_tab, text = "Run",command = self.run)
         self.button.grid()
-        self.button = ttk.Button(xrr_tab, text = "Save Motofit File",command = self.save_motofit)
+        self.button = ttk.Button(xrd_tab, text = "Save Motofit File",command = self.save_motofit)
         self.button.grid()
 
     def fileDialogZscan(self):
