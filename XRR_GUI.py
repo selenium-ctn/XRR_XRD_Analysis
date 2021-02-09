@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog, LabelFrame
 from tkinter.filedialog import asksaveasfile
 import XRR_Analysis_Compat as XAC 
+import XRD_Analysis_Compat as XDAC 
 import config
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -102,7 +103,7 @@ class GUI:
         self.label.grid(row=12, column=0)
         self.combobox = ttk.Combobox(xrr_tab, textvariable=tk_filter, values=[1.000000, 1.880281, 11.357267, 124.334029, 770.532653])
         self.combobox.grid(row=12, column=1)
-        self.button = ttk.Button(xrr_tab, text = "Run",command = self.run)
+        self.button = ttk.Button(xrr_tab, text = "Run",command = self.xrr_run)
         self.button.grid()
         self.button = ttk.Button(xrr_tab, text = "Save Motofit File",command = self.save_motofit)
         self.button.grid()
@@ -149,7 +150,7 @@ class GUI:
         self.label.grid(row=12, column=0)
         self.entry = ttk.Entry(xrd_tab, textvariable=tk_rock_res)
         self.entry.grid(row=12, column=1)
-        self.button = ttk.Button(xrd_tab, text = "Run",command = self.run)
+        self.button = ttk.Button(xrd_tab, text = "Run",command = self.xrd_run)
         self.button.grid()
         self.button = ttk.Button(xrd_tab, text = "Save Motofit File",command = self.save_motofit)
         self.button.grid()
@@ -176,7 +177,7 @@ class GUI:
         tk_stepsize.set(config.step_size)
         tk_scanspeed.set(config.scan_speed)
 
-    def run(self):
+    def xrr_run(self):
         global spec_q
         global renorm_reflect
         global renorm_reflect_error
@@ -188,7 +189,6 @@ class GUI:
         config.B = tk_B.get()
         config.filter = tk_filter.get()
         zscan_data, spec_data, bkg_data = XAC.init_data(zscan, spec, bkg)
-        print(zscan_data)
         stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XAC.zscan_func(zscan_data[0], zscan_data[1])      
         zscan_plot_str = '\n'.join((
             r'eff beam height=%.2f mm' % (effective_beam_height, ),
@@ -226,6 +226,44 @@ class GUI:
         toolbarFrame2.grid(row=26, column=3)
         toolbar2 = NavigationToolbar2Tk(canvas2, toolbarFrame2)
         toolbar2.update()
+
+    def xrd_run(self):
+        config.sample_name = tk_samplename.get()
+        config.step_size = tk_stepsize.get()
+        config.scan_speed = tk_scanspeed.get()
+        config.user_lambda = tk_lambda.get()
+        config.B = tk_B.get()
+        config.filter = tk_filter.get()
+        try: 
+            bkg
+        except: 
+            zscan_data, spec_data, bkg_data = XDAC.init_data_without_bkg(zscan, spec)
+        else:
+            zscan_data, spec_data, bkg_data = XDAC.init_data_with_bkg(zscan, spec, bkg)
+        stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XDAC.zscan_func(zscan_data[0], zscan_data[1])      
+        zscan_plot_str = '\n'.join((
+            r'eff beam height=%.2f mm' % (effective_beam_height, ),
+            r'STB=%.2f cps' % (stb, )))
+        fig = Figure(figsize = (6, 4), dpi = 100)
+        plot1 = fig.add_subplot(9, 1, (1,8))
+        plot1.plot(zscan_data[0], zscan_data[1])
+        plot1.vlines(z_1, 0, stb, linestyles='dashed')
+        plot1.vlines(z_2, 0, stb, linestyles='dashed')
+        plot1.hlines(stb, zscan_data[0][0], z_1, color="black")
+        plot1.hlines(0, z_2, zscan_data[0][zscan_data[0].size - 1], color="black")
+        plot1.plot(reduced_z, inter + slope * reduced_z)
+        plot1.set(xlabel="z (mm)", ylabel="cps")
+        plot1.set_title("zscan")
+        plot1.text(0.65, 0.95, zscan_plot_str, transform=plot1.transAxes, fontsize=8, verticalalignment='top')
+        canvas = FigureCanvasTkAgg(fig, master=self.xrd_tab)
+        canvas.draw()
+        canvas.get_tk_widget().grid(column=3, row=1, rowspan=11)
+        print(stb)
+        toolbarFrame = ttk.Frame(master=self.xrd_tab)
+        toolbarFrame.grid(row=12, column=3, padx=0, pady=0)
+        toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
+        toolbar.update()
+        
 
     def save_motofit(self):
         f = asksaveasfile(mode='w', defaultextension=".txt", initialfile="%s_XRR.txt" % (config.sample_name))

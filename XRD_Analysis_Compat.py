@@ -15,15 +15,18 @@ def init_data_with_bkg(zscan, xrd_spec, xrd_bkg):
     # read files into lists, turn lists into numpy matrices
     zscan_z, zscan_cps = file_reading.pull_data(zscan)
     spec_theta, spec_cps = file_reading.pull_data(xrd_spec)
-    try:
-        xrd_bkg 
-    except: 
-        config.xrd_no_bkg = 1 
-        bkg_theta = []
-        bkg_cps = []
-    else: 
-        bkg_theta, bkg_cps = file_reading.pull_data(xrd_bkg) 
+    bkg_theta, bkg_cps = file_reading.pull_data(xrd_bkg) 
     return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
+
+def init_data_without_bkg(zscan, xrd_spec):
+    # read files into lists, turn lists into numpy matrices
+    zscan_z, zscan_cps = file_reading.pull_data(zscan)
+    spec_theta, spec_cps = file_reading.pull_data(xrd_spec)
+    config.xrd_no_bkg = 1
+    bkg_theta = []
+    bkg_cps = []
+    return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
+    
 
 #def pull_vars():
 
