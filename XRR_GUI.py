@@ -16,7 +16,7 @@ class GUI:
         global tk_zscan
         global tk_spec
         global tk_bkg
-        global tk_rocking
+        global tk_rock
         global tk_samplename
         global tk_stepsize 
         global tk_scanspeed
@@ -25,10 +25,11 @@ class GUI:
         global tk_filter
         global tk_spec_res
         global tk_rock_res 
+        global tk_stb
         tk_zscan = tk.StringVar()
         tk_spec = tk.StringVar()
         tk_bkg = tk.StringVar()
-        tk_rocking = tk.StringVar()
+        tk_rock = tk.StringVar()
         tk_samplename = tk.StringVar()
         tk_stepsize = tk.DoubleVar()
         tk_scanspeed = tk.DoubleVar()
@@ -37,10 +38,11 @@ class GUI:
         tk_B = tk.DoubleVar()
         tk_spec_res = tk.DoubleVar()
         tk_rock_res = tk.DoubleVar()
+        tk_stb = tk.DoubleVar()
         tk_zscan.set("No file chosen")
         tk_spec.set("No file chosen")
         tk_bkg.set("No file chosen")
-        tk_rocking.set("No file chosen")
+        tk_rock.set("No file chosen")
         tk_samplename.set(config.sample_name)
         tk_stepsize.set(config.step_size)
         tk_scanspeed.set(config.scan_speed)
@@ -49,6 +51,7 @@ class GUI:
         tk_filter.set(config.filter)
         tk_spec_res.set(config.spec_res)
         tk_rock_res.set(config.rock_res)
+        tk_stb.set(config.stb)
         self.master = master 
         master.title("XRR/XRD Data Reduction")
         tabControl = ttk.Notebook(root)
@@ -123,7 +126,7 @@ class GUI:
         self.label.grid(row=3, column=1)
         self.button = ttk.Button(xrd_tab, text = "Select rocking curve file",command = self.fileDialogBkg)
         self.button.grid(pady=2.5, sticky="W", row=4, column=0)
-        self.label = ttk.Label(xrd_tab, textvariable=tk_rocking)
+        self.label = ttk.Label(xrd_tab, textvariable=tk_rock)
         self.label.grid(row=4, column=1)
         #import parameters? 
         self.label = ttk.Label(xrd_tab, text="Sample name")
@@ -150,10 +153,20 @@ class GUI:
         self.label.grid(row=12, column=0)
         self.entry = ttk.Entry(xrd_tab, textvariable=tk_rock_res)
         self.entry.grid(row=12, column=1)
-        self.button = ttk.Button(xrd_tab, text = "Run",command = self.xrd_run)
+        self.label = ttk.Label(xrd_tab, text="STB intensity")
+        self.label.grid(row=13, column=0)
+        self.entry = ttk.Entry(xrd_tab, textvariable=tk_stb)
+        self.entry.grid(row=13, column=1)
+        self.button = ttk.Button(xrd_tab, text = "Run Specular",command = self.xrd_run_specular)
         self.button.grid()
-        self.button = ttk.Button(xrd_tab, text = "Save Motofit File",command = self.save_motofit)
+        """
+        self.button = ttk.Button(xrd_tab, text = "Run Rocking Curve",command = self.xrd_run_rocking)
         self.button.grid()
+        self.button = ttk.Button(xrd_tab, text = "Save Specular File",command = self.save_specular)
+        self.button.grid()
+        self.button = ttk.Button(xrd_tab, text = "Save Rocking Curve File",command = self.save_rocking)
+        self.button.grid()
+        """
 
     def fileDialogZscan(self):
         global zscan
@@ -171,6 +184,11 @@ class GUI:
         global bkg
         bkg= filedialog.askopenfile(initialdir = "/", title="Select background file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
         tk_bkg.set(bkg.name)
+
+    def fileDialogRock(self):
+        global rock
+        rock= filedialog.askopenfile(initialdir = "/", title="Select rocking curve file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+        tk_rock.set(rock.name)
 
     def importVars(self):
         XAC.pull_vars(spec)
@@ -227,43 +245,69 @@ class GUI:
         toolbar2 = NavigationToolbar2Tk(canvas2, toolbarFrame2)
         toolbar2.update()
 
-    def xrd_run(self):
+    def xrd_run_specular(self):
         config.sample_name = tk_samplename.get()
         config.step_size = tk_stepsize.get()
         config.scan_speed = tk_scanspeed.get()
         config.user_lambda = tk_lambda.get()
         config.B = tk_B.get()
         config.filter = tk_filter.get()
-        try: 
-            bkg
-        except: 
-            zscan_data, spec_data, bkg_data = XDAC.init_data_without_bkg(zscan, spec)
+        try:
+            zscan
+        except:
+            try:
+                bkg
+            except:
+                zscan_data, spec_data, bkg_data = XDAC.init_data(xrd_spec=spec)
+            else:
+                zscan_data, spec_data, bkg_data = XDAC.init_data(xrd_spec=spec, xrd_bkg=bkg)
         else:
-            zscan_data, spec_data, bkg_data = XDAC.init_data_with_bkg(zscan, spec, bkg)
-        stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XDAC.zscan_func(zscan_data[0], zscan_data[1])      
-        zscan_plot_str = '\n'.join((
-            r'eff beam height=%.2f mm' % (effective_beam_height, ),
-            r'STB=%.2f cps' % (stb, )))
-        fig = Figure(figsize = (6, 4), dpi = 100)
-        plot1 = fig.add_subplot(9, 1, (1,8))
-        plot1.plot(zscan_data[0], zscan_data[1])
-        plot1.vlines(z_1, 0, stb, linestyles='dashed')
-        plot1.vlines(z_2, 0, stb, linestyles='dashed')
-        plot1.hlines(stb, zscan_data[0][0], z_1, color="black")
-        plot1.hlines(0, z_2, zscan_data[0][zscan_data[0].size - 1], color="black")
-        plot1.plot(reduced_z, inter + slope * reduced_z)
-        plot1.set(xlabel="z (mm)", ylabel="cps")
-        plot1.set_title("zscan")
-        plot1.text(0.65, 0.95, zscan_plot_str, transform=plot1.transAxes, fontsize=8, verticalalignment='top')
-        canvas = FigureCanvasTkAgg(fig, master=self.xrd_tab)
-        canvas.draw()
-        canvas.get_tk_widget().grid(column=3, row=1, rowspan=11)
-        print(stb)
-        toolbarFrame = ttk.Frame(master=self.xrd_tab)
-        toolbarFrame.grid(row=12, column=3, padx=0, pady=0)
-        toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
-        toolbar.update()
-        
+            try:
+                bkg
+            except: 
+                zscan_data, spec_data, bkg_data = XDAC.init_data(zscan=zscan, xrd_spec=spec)
+            else:
+                zscan_data, spec_data, bkg_data = XDAC.init_data(zscan=zscan, xrd_spec=spec, xrd_bkg=bkg)
+        if tk_stb.get() == 0.0:
+            stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XDAC.zscan_func(zscan_data[0], zscan_data[1])      
+            zscan_plot_str = '\n'.join((
+                r'eff beam height=%.2f mm' % (effective_beam_height, ),
+                r'STB=%.2f cps' % (stb, )))
+            fig = Figure(figsize = (6, 4), dpi = 100)
+            plot1 = fig.add_subplot(9, 1, (1,8))
+            plot1.plot(zscan_data[0], zscan_data[1])
+            plot1.vlines(z_1, 0, stb, linestyles='dashed')
+            plot1.vlines(z_2, 0, stb, linestyles='dashed')
+            plot1.hlines(stb, zscan_data[0][0], z_1, color="black")
+            plot1.hlines(0, z_2, zscan_data[0][zscan_data[0].size - 1], color="black")
+            plot1.plot(reduced_z, inter + slope * reduced_z)
+            plot1.set(xlabel="z (mm)", ylabel="cps")
+            plot1.set_title("zscan")
+            plot1.text(0.65, 0.95, zscan_plot_str, transform=plot1.transAxes, fontsize=8, verticalalignment='top')
+            canvas = FigureCanvasTkAgg(fig, master=self.xrd_tab)
+            canvas.draw()
+            canvas.get_tk_widget().grid(column=3, row=1, rowspan=11)
+            print(stb)
+            toolbarFrame = ttk.Frame(master=self.xrd_tab)
+            toolbarFrame.grid(row=12, column=3, padx=0, pady=0)
+            toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
+            toolbar.update()
+        else: 
+            stb = tk_stb.get()
+        spec_q, norm_reflectivity, error_bars = XDAC.plot_XRD_data(spec_data[0], bkg_data[0], spec_data[1], bkg_data[1], stb)
+        fig2 = Figure(figsize=(6, 4), dpi = 100)
+        plot2 = fig2.add_subplot(9, 1, (1,8))
+        plot2.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')
+        plot2.set(xlabel=r'q ($\mathrm{\AA}$)', ylabel="Reflectivity")
+        plot2.set_title("q vs Reflectivity")
+        plot2.set_yscale("log")
+        canvas2 = FigureCanvasTkAgg(fig2, master=self.xrd_tab)
+        canvas2.draw()
+        canvas2.get_tk_widget().grid(column=3, row=14, rowspan=11)
+        toolbarFrame2 = ttk.Frame(master=self.xrd_tab)
+        toolbarFrame2.grid(row=26, column=3)
+        toolbar2 = NavigationToolbar2Tk(canvas2, toolbarFrame2)
+        toolbar2.update()
 
     def save_motofit(self):
         f = asksaveasfile(mode='w', defaultextension=".txt", initialfile="%s_XRR.txt" % (config.sample_name))
