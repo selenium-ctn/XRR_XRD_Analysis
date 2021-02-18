@@ -144,7 +144,7 @@ class GUI:
         self.label.grid(row=11, column=0)
         self.combobox = ttk.Combobox(xrd_tab, textvariable=tk_lambda, values=[1.540562, 1.54184])
         self.combobox.grid(row=11, column=1)
-        self.label = ttk.Label(xrd_tab, text="STB intensity")
+        self.label = ttk.Label(xrd_tab, text="STB intensity (cps)")
         self.label.grid(row=12, column=0)
         self.entry = ttk.Entry(xrd_tab, textvariable=tk_stb)
         self.entry.grid(row=12, column=1)
