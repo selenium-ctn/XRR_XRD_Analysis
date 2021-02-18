@@ -11,7 +11,7 @@ import XRD_fun
 from scipy.optimize import curve_fit
 import config
 
-def init_data(zscan=0, xrd_spec=0, xrd_bkg=0):
+def init_data(zscan=0, xrd_spec=0, xrd_bkg=0, xrd_rock=0):
     # read files into lists, turn lists into numpy matrices
     if zscan !=0:
         zscan_z, zscan_cps = file_reading.pull_data(zscan)
@@ -21,13 +21,21 @@ def init_data(zscan=0, xrd_spec=0, xrd_bkg=0):
         zscan_cps = [] 
     if xrd_spec !=0:
         spec_theta, spec_cps = file_reading.pull_data(xrd_spec)
+    else:
+        spec_theta = []
+        spec_cps = []
     if xrd_bkg != 0:
         bkg_theta, bkg_cps = file_reading.pull_data(xrd_bkg) 
     else:
         config.xrd_no_bkg = 1
         bkg_theta = []
         bkg_cps = []
-    return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
+    if xrd_rock != 0:
+        rock_theta, rock_cps = file_reading.pull_data(xrd_rock)
+    else:
+        rock_theta = []
+        rock_cps = []
+    return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps), (rock_theta, rock_cps)
 
 """
 def init_data_without_bkg(zscan, xrd_spec):
