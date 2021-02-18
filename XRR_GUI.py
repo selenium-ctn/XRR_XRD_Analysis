@@ -152,9 +152,9 @@ class GUI:
         self.button.grid()
         self.button = ttk.Button(xrd_tab, text = "Run Rocking Curve",command = self.xrd_run_rocking)
         self.button.grid()
-        """
         self.button = ttk.Button(xrd_tab, text = "Save Specular File",command = self.save_specular)
         self.button.grid()
+        """
         self.button = ttk.Button(xrd_tab, text = "Save Rocking Curve File",command = self.save_rocking)
         self.button.grid()
         """
@@ -237,6 +237,10 @@ class GUI:
         toolbar2.update()
 
     def xrd_run_specular(self):
+        global two_theta
+        global spec_q
+        global norm_reflectivity
+        global reflect_error
         config.sample_name = tk_samplename.get()
         config.step_size = tk_stepsize.get()
         config.scan_speed = tk_scanspeed.get()
@@ -285,7 +289,8 @@ class GUI:
             toolbar.update()
         else: 
             stb = tk_stb.get()
-        spec_q, norm_reflectivity, error_bars = XDAC.plot_XRD_data(spec_data[0], bkg_data[0], spec_data[1], bkg_data[1], stb)
+        two_theta = spec_data[0] 
+        spec_q, norm_reflectivity, error_bars, reflect_error = XDAC.plot_XRD_data(spec_data[0], bkg_data[0], spec_data[1], bkg_data[1], stb)
         fig2 = Figure(figsize=(6, 4), dpi = 100)
         plot2 = fig2.add_subplot(9, 1, (1,8))
         plot2.errorbar(spec_q[2:], norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red')
@@ -358,6 +363,13 @@ class GUI:
         if f is None:
             return 
         XAC.save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq, f)
+
+
+    def save_specular(self):
+        f = asksaveasfile(mode='w', defaultextension=".txt", initialfile="%s_XRD.txt" % (config.sample_name))
+        if f is None:
+            return 
+        XDAC.save_specular_file(two_theta, spec_q, norm_reflectivity, reflect_error, f)
 
 root = tk.Tk()
 gui = GUI(root)

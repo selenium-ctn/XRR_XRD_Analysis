@@ -75,8 +75,20 @@ def plot_XRD_data(spec_theta, bkg_theta, spec_cps, bkg_cps, stb_inten):
     else:
         error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
 
-    return spec_q, norm_reflectivity, error_bars
+    reflect_error = norm_reflectivity * .05 
 
+    return spec_q, norm_reflectivity, error_bars, reflect_error
+
+def save_specular_file(two_theta, spec_q, reflectivity, error, f):
+    #write data to text file for motofit to use
+    #maybe do a version or hash thing where if there's already a file created, another w/ a diff suffix can be created 
+    #choose where to save to?
+    #f = open("%s_XRR.txt" % (config.sample_name), "x")
+    for (th, q, r, er) in zip(two_theta, spec_q, reflectivity, error):
+        f.write('{0} {1} {2} {3}\n'.format(th, q, r, er))
+    f.close()
+
+"""
 def bragg_peak_analysis_with_bkg(spec_theta, bkg_theta, spec_cps, bkg_cps, stb_inten):
     #Specular & background 
     spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / config.user_lambda
@@ -106,5 +118,5 @@ def bragg_peak_analysis_with_bkg(spec_theta, bkg_theta, spec_cps, bkg_cps, stb_i
 
     #vertical domain size 
     vert_domain_size = 2 * pi * 0.94 / np.sqrt(np.power(FWHM, 2) - np.power(config.spec_res, 2))
-
+"""
 
