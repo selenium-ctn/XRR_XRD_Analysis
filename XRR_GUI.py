@@ -404,7 +404,7 @@ class GUI:
         theta = rock_data[0]
         reflectivity = (rock_data[1] / stb)
         error_bars = np.sqrt((rock_data[1] * config.step_size * 60 / config.scan_speed)) / stb
-        fig2 = Figure(figsize=(6, 4), dpi = 100)
+        fig2 = Figure(figsize=(7, 4), dpi = 100)
         plot2 = fig2.add_subplot(9, 1, (1,8))
         #plot2.plot(theta, reflectivity)
         plot2.errorbar(theta, reflectivity, yerr=error_bars, ecolor='red')
