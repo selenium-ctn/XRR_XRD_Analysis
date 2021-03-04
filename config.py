@@ -7,3 +7,5 @@ filter = 1.000000
 xrd_no_bkg = 0 
 xrd_no_zscan = 0
 stb = 0.0 
+xrr_no_zscan = 0 
+eff_beam_height = 0.0

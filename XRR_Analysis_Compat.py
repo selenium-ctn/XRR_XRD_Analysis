@@ -24,18 +24,19 @@ import config
 #B = 10
 #filter = 770.53 # or 0 
 
-def testprint():
-    print(config.sample_name)
-
-def init_data(zscan, xrr_spec, xrr_bkg):
-    #read files into lists, turn lists into numpy matrices
-    zscan_z, zscan_cps = file_reading.pull_data(zscan)
+def init_data(zscan=0, xrr_spec=0, xrr_bkg=0):
+    # read files into lists, turn lists into numpy matrices
+    if zscan !=0:
+        zscan_z, zscan_cps = file_reading.pull_data(zscan)
+        #apply filter 
+        zscan_cps = zscan_cps * config.filter
+    else:
+        config.xrr_no_zscan = 1
+        zscan_z = []
+        zscan_cps = [] 
     spec_theta, spec_cps = file_reading.pull_data(xrr_spec)
-    bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg)  
+    bkg_theta, bkg_cps = file_reading.pull_data(xrr_bkg) 
 
-    #apply filter 
-    zscan_cps = zscan_cps * config.filter
-    #mult for zscan only!!! maybe don't worry...maybe do....tell user to use automatic filter or nah....
     return (zscan_z, zscan_cps), (spec_theta, spec_cps), (bkg_theta, bkg_cps)
 
 def pull_vars(file):
