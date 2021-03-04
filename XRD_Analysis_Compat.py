@@ -75,9 +75,7 @@ def plot_XRD_data(spec_theta, bkg_theta, spec_cps, bkg_cps, stb_inten):
     else:
         error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
 
-    reflect_error = norm_reflectivity * .05 
-
-    return spec_q, norm_reflectivity, error_bars, reflect_error
+    return spec_q, norm_reflectivity, error_bars
 
 def save_specular_file(two_theta, spec_q, reflectivity, error, f):
     #write data to text file for motofit to use
@@ -88,6 +86,10 @@ def save_specular_file(two_theta, spec_q, reflectivity, error, f):
         f.write('{0} {1} {2} {3}\n'.format(th, q, r, er))
     f.close()
 
+def save_rocking_file(theta, reflectivity, error, f):
+    for (th, r, er) in zip(theta, reflectivity, error):
+        f.write('{0} {1} {2}\n'.format(th, r, er))
+    f.close()
 """
 def bragg_peak_analysis_with_bkg(spec_theta, bkg_theta, spec_cps, bkg_cps, stb_inten):
     #Specular & background 

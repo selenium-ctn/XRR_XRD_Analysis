@@ -179,10 +179,8 @@ class GUI:
         self.button.grid()
         self.button = ttk.Button(xrd_tab, text = "Save Specular File",command = self.save_specular)
         self.button.grid()
-        """
         self.button = ttk.Button(xrd_tab, text = "Save Rocking Curve File",command = self.save_rocking)
         self.button.grid()
-        """
 
     def fileDialogZscan(self):
         global zscan
@@ -294,7 +292,7 @@ class GUI:
         global two_theta
         global spec_q
         global norm_reflectivity
-        global reflect_error
+        global error_bars
         config.sample_name = tk_samplename.get()
         config.step_size = tk_stepsize.get()
         config.scan_speed = tk_scanspeed.get()
@@ -344,7 +342,7 @@ class GUI:
         else: 
             stb = tk_stb.get()
         two_theta = spec_data[0] 
-        spec_q, norm_reflectivity, error_bars, reflect_error = XDAC.plot_XRD_data(spec_data[0], bkg_data[0], spec_data[1], bkg_data[1], stb)
+        spec_q, norm_reflectivity, error_bars = XDAC.plot_XRD_data(spec_data[0], bkg_data[0], spec_data[1], bkg_data[1], stb)
         fig2 = Figure(figsize=(6, 4), dpi = 100)
         plot2 = fig2.add_subplot(9, 1, (1,8))
         plot2.errorbar(spec_q, norm_reflectivity, yerr=error_bars, ecolor='red')
@@ -360,6 +358,9 @@ class GUI:
         toolbar2.update()
 
     def xrd_run_rocking(self):
+        global theta
+        global reflectivity
+        global error_bars
         config.sample_name = tk_samplename.get()
         config.step_size = tk_stepsize.get()
         config.scan_speed = tk_scanspeed.get()
@@ -398,9 +399,13 @@ class GUI:
             toolbar.update()
         else: 
             stb = tk_stb.get()
+        theta = rock_data[0]
+        reflectivity = (rock_data[1] / stb)
+        error_bars = np.sqrt((rock_data[1] * config.step_size * 60 / config.scan_speed)) / stb
         fig2 = Figure(figsize=(6, 4), dpi = 100)
         plot2 = fig2.add_subplot(9, 1, (1,8))
-        plot2.plot(rock_data[0], (rock_data[1] / stb))
+        #plot2.plot(theta, reflectivity)
+        plot2.errorbar(theta, reflectivity, yerr=error_bars, ecolor='red')
         plot2.set(xlabel="Theta", ylabel="Reflectivity")
         plot2.set_title("Theta vs Reflectivity")
         plot2.set_yscale("log")
@@ -418,12 +423,18 @@ class GUI:
             return 
         XAC.save_motofit_file(spec_q, renorm_reflect, renorm_reflect_error, dq, f)
 
-
     def save_specular(self):
-        f = asksaveasfile(mode='w', defaultextension=".txt", initialfile="%s_XRD.txt" % (config.sample_name))
+        f = asksaveasfile(mode='w', defaultextension=".txt", initialfile="%s_spec_XRD.txt" % (config.sample_name))
         if f is None:
             return 
-        XDAC.save_specular_file(two_theta, spec_q, norm_reflectivity, reflect_error, f)
+        XDAC.save_specular_file(two_theta, spec_q, norm_reflectivity, error_bars, f)
+
+    def save_rocking(self):
+        f = asksaveasfile(mode='w', defaultextension=".txt", initialfile="%s_rock_XRD.txt" % (config.sample_name))
+        if f is None:
+            return 
+        XDAC.save_rocking_file(theta, reflectivity, error_bars, f)
+
 
 root = tk.Tk()
 gui = GUI(root)
