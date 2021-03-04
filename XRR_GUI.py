@@ -97,7 +97,7 @@ class GUI:
         self.label.grid(row=9, column=0)
         self.entry = ttk.Entry(xrr_tab, textvariable=tk_scanspeed)
         self.entry.grid(row=9, column=1)
-        self.label = ttk.Label(xrr_tab, text="Lambda (angstroms)")
+        self.label = ttk.Label(xrr_tab, text="Lambda (\u212B)")
         self.label.grid(row=10, column=0)
         self.combobox = ttk.Combobox(xrr_tab, textvariable=tk_lambda, values=[1.540562, 1.54184])
         self.combobox.grid(row=10, column=1)
@@ -165,7 +165,7 @@ class GUI:
         self.label.grid(row=10, column=0)
         self.entry = ttk.Entry(xrd_tab, textvariable=tk_scanspeed)
         self.entry.grid(row=10, column=1)
-        self.label = ttk.Label(xrd_tab, text="Lambda (angstroms)")
+        self.label = ttk.Label(xrd_tab, text="Lambda (\u212B)")
         self.label.grid(row=11, column=0)
         self.combobox = ttk.Combobox(xrd_tab, textvariable=tk_lambda, values=[1.540562, 1.54184])
         self.combobox.grid(row=11, column=1)
@@ -230,6 +230,8 @@ class GUI:
         tk_scanspeed.set(config.scan_speed)
 
     def xrr_run(self):
+        print(config.user_lambda)
+        print(config.filter)
         global spec_q
         global renorm_reflect
         global renorm_reflect_error
@@ -406,8 +408,8 @@ class GUI:
         plot2 = fig2.add_subplot(9, 1, (1,8))
         #plot2.plot(theta, reflectivity)
         plot2.errorbar(theta, reflectivity, yerr=error_bars, ecolor='red')
-        plot2.set(xlabel="Theta", ylabel="Reflectivity")
-        plot2.set_title("Theta vs Reflectivity")
+        plot2.set(xlabel=r'$\mathrm{\theta}$', ylabel="Reflectivity")
+        plot2.set_title(r'$\mathrm{\theta}$ vs Reflectivity')
         plot2.set_yscale("log")
         canvas2 = FigureCanvasTkAgg(fig2, master=self.xrd_tab)
         canvas2.draw()
