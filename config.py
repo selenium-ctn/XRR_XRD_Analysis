@@ -1,4 +1,3 @@
-sample_name = ""
 step_size = 0.0
 scan_speed = 0.0
 user_lambda = 0.0
