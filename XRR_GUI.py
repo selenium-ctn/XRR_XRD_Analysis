@@ -54,13 +54,16 @@ class GUI:
         tabControl = ttk.Notebook(root)
         self.xrr_tab = ttk.Frame(tabControl)
         self.xrd_tab = ttk.Frame(tabControl)
-        #self.instruct_tab = ttk.Frame(tabControl)
+        self.xrr_instruct_tab = ttk.Frame(tabControl)
+        self.xrd_instruct_tab = ttk.Frame(tabControl)
         xrr_tab = self.xrr_tab 
         xrd_tab = self.xrd_tab 
-        #instruct_tab = self.instruct_tab 
+        xrr_instruct_tab = self.xrr_instruct_tab
+        xrd_instruct_tab = self.xrd_instruct_tab 
         tabControl.add(xrr_tab, text='XRR')
+        tabControl.add(xrr_instruct_tab, text="XRR Instructions")
         tabControl.add(xrd_tab, text='XRD')
-        #tabControl.add(instruct_tab, text="Instructions")
+        tabControl.add(xrd_instruct_tab, text="XRD Instructions")
         tabControl.grid(sticky="W")
         self.button = ttk.Button(xrr_tab, text = "Select directory",command = self.fileDialogDir)
         self.button.grid(pady=2.5, sticky="W", row=1, column=0)
@@ -190,6 +193,75 @@ class GUI:
         self.label.grid(row=13, column=1)
         self.label = ttk.Label(xrd_tab, text="*Only necessary if running without zscan file")
         self.label.grid(row=14, column=1)
+
+        #xrr instructions
+        T = tk.Text(xrr_instruct_tab) #height=50, width=50)
+        T.pack() #expand=True, fill="both")
+        #T.grid(row=0, column=0)
+        quote = """XRR:
+        What you can obtain from this application:
+            - STB intensity 
+            - Effective beam height 
+            - Zscan plot
+            - q vs Reflectivity plot
+            - File for Motofit processing. Columns are as follows, from left to right: q, renormalized reflectivity, renormalized reflectivity error, dq 
+
+        What you need:
+            - Specular scan file
+            - Background scan file
+            - Step size, scan speed, lambda, sample length, filter 
+            - If you did not use a filter, keep the value as "1.0"
+            - Zscan file OR STB intensity and effective beam height values. Enter the values manually if you did not take a zscan 
+
+        Instructions for use: 
+            1. Select the directory your files are saved in. This will allow you to access them quickly 
+            2. Select the files you would like to use 
+            3. Import parameters from the files if you would like to (this can be overwritten)
+            4. Fill in the rest of the necessary parameters 
+            5. Hit run 
+            6. Save motofit file 
+        """
+        T.insert(tk.END, quote)
+        T.config(state='disabled')
+
+        #xrd instructions 
+        T = tk.Text(xrd_instruct_tab) #height=50, width=50)
+        T.pack() #expand=True, fill="both")
+        #T.grid(row=0, column=0)
+        quote = """XRD:
+        What you can obtain from this application:
+            - STB intensity 
+            - Effective beam height 
+            - Zscan plot
+            - q vs Reflectivity plot (specular)
+            - Theta vs Reflectivity plot (rocking curve)
+            - Specular file for Motofit processing. Columns are as follows, from left to right: 2theta, q, reflectivity, error
+            - Rocking curve file for Motofit processing. Columns are as follows, from left to right: theta, reflectivity, error
+
+        What you need for specular analysis:
+            - Specular scan file
+            - Step size, scan speed, lambda 
+            - Zscan file OR STB intensity. Enter the value manually if you did not take a zscan 
+
+        What you need for rocking curve analysis:
+            - Specular scan file
+            - Rocking curve file 
+            - Step size, scan speed, lambda 
+            - Zscan file OR STB intensity. Enter the value manually if you did not take a zscan 
+            Optional:
+                - Background scan file 
+
+        Instructions for use: 
+            1. Select the directory your files are saved in. This will allow you to access them quickly 
+            2. Select the files you would like to use 
+            3. Import parameters from the files if you would like to (this can be overwritten)
+            4. Fill in the rest of the necessary parameters 
+            5. Hit the run button for the data you are interested in analyzing (specular or RC)
+            6. Save motofit file for the data you are interested in saving (specular or RC)
+        """
+        T.insert(tk.END, quote)
+        T.config(state='disabled')
+
 
     def fileDialogDir(self):
         global startdir
