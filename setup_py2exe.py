@@ -1,8 +1,12 @@
-from distutils.core import setup
-import py2exe
-import matplotlib
+#from distutils.core import setup
+#import py2exe
+#import matplotlib
 
-#DO NOT USE PY2EXE USE CX FREEZE 
+#DO NOT USE PY2EXE, USE CX FREEZE 
+#SERIOUSLY USE CX FREEZE
+#setup.py file is the one you want 
+
+""""
 setup(
   console=['XRR_GUI.py'],
   data_files=matplotlib.get_py2exe_datafiles(),
@@ -14,5 +18,6 @@ setup(
     }
   }
 )
+"""
 
 #http://www.py2exe.org/index.cgi/MatPlotLib
