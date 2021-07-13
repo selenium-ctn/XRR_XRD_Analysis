@@ -47,7 +47,7 @@ def zscan_func(zscan_z, zscan_cps):
     stb_inten, effective_beam_height, z_1, z_2, reduced_z, inter, slope = zscan_fun.stb_intensity_and_eff_beam_height(zscan_z, zscan_cps) 
     return stb_inten, effective_beam_height, z_1, z_2, reduced_z, inter, slope
 
-def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_theta, bkg_cps):
+def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_theta, bkg_cps, rem_points=4):
     #specular & background 
     spec_q = 4 * pi * np.sin(np.deg2rad(spec_theta / 2)) / config.user_lambda
     bkg_q = 4 * pi * np.sin(np.deg2rad(bkg_theta / 2)) / config.user_lambda
@@ -67,9 +67,9 @@ def spec_bkg_func(stb_inten, effective_beam_height, spec_theta, spec_cps, bkg_th
     #compute error bars 
     error_bars = np.sqrt((spec_cps * config.step_size * 60 / config.scan_speed) + (bkg_cps * config.step_size * 60 / config.scan_speed)) / stb_inten
 
-    #exclude first 5 data points (creates a less messy file for motofit). renormalize reflectivity w/ the highest value. 
+    #exclude first x (default 4) data points (creates a less messy file for motofit). renormalize reflectivity w/ the highest value. 
     #calculate the renormalized reflectivity error. 
-    norm_reflectivity = norm_reflectivity[4:]
+    norm_reflectivity = norm_reflectivity[rem_points:]
     renorm_reflect = norm_reflectivity / np.amax(norm_reflectivity)
     dq = .00778 #machine dependent
     renorm_reflect_error = renorm_reflect * .05 

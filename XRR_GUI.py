@@ -269,22 +269,22 @@ class GUI:
 
     def fileDialogZscan(self):
         global zscan
-        zscan = filedialog.askopenfile(initialdir = startdir, title="Select zscan file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+        zscan = filedialog.askopenfile(initialdir = startdir, title="Select zscan file", filetypes = (("all files","*.*"),("dat files","*.dat"),("text files","*.txt")), mode="r")
         tk_zscan.set(path.basename(zscan.name))
 
     def fileDialogSpec(self):
         global spec
-        spec= filedialog.askopenfile(initialdir = startdir, title="Select specular file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+        spec= filedialog.askopenfile(initialdir = startdir, title="Select specular file", filetypes = (("all files","*.*"),("dat files","*.dat"),("text files","*.txt")), mode="r")
         tk_spec.set(path.basename(spec.name))
 
     def fileDialogBkg(self):
         global bkg
-        bkg= filedialog.askopenfile(initialdir = startdir, title="Select background file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+        bkg= filedialog.askopenfile(initialdir = startdir, title="Select background file", filetypes = (("all files","*.*"),("dat files","*.dat"),("text files","*.txt")), mode="r")
         tk_bkg.set(path.basename(bkg.name))
 
     def fileDialogRock(self):
         global rock
-        rock= filedialog.askopenfile(initialdir = startdir, title="Select rocking curve file", filetypes = (("dat files","*.dat"),("text files","*.txt"), ("all files","*.*")), mode="r")
+        rock= filedialog.askopenfile(initialdir = startdir, title="Select rocking curve file", filetypes = (("all files","*.*"),("dat files","*.dat"),("text files","*.txt")), mode="r")
         tk_rock.set(path.basename(rock.name))
 
     def fileClearZscan(self):
