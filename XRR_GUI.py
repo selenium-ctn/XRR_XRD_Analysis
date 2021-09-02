@@ -331,8 +331,8 @@ class GUI:
         if config.xrr_no_zscan == 0:
             stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XAC.zscan_func(zscan_data[0], zscan_data[1])      
             zscan_plot_str = '\n'.join((
-                r'eff beam height=%.2f mm' % (effective_beam_height, ),
-                r'STB=%.2f cps' % (stb, )))
+                r'eff beam height=%.3f mm' % (effective_beam_height, ),
+                r'STB=%.0f cps' % (stb, )))
             fig = Figure(figsize = (6, 4), dpi = 100)
             plot1 = fig.add_subplot(9, 1, (1,8))
             plot1.plot(zscan_data[0], zscan_data[1], label="data")
@@ -361,7 +361,7 @@ class GUI:
         fig2 = Figure(figsize=(6, 4), dpi = 100)
         plot2 = fig2.add_subplot(9, 1, (1,8))
         plot2.errorbar(spec_q[2:], orig_norm_reflectivity[2:], yerr=error_bars[2:], ecolor='red', label="data")
-        plot2.set(xlabel=r'q ($\mathrm{\AA}$)', ylabel="Reflectivity")
+        plot2.set(xlabel=r'q ($\mathrm{\AA ^{-1}}$)', ylabel="Reflectivity")
         plot2.set_title("q vs Reflectivity")
         plot2.set_yscale("log")
         handles, __ = plot2.get_legend_handles_labels()
@@ -403,8 +403,8 @@ class GUI:
         if config.xrd_no_zscan == 0:
             stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XDAC.zscan_func(zscan_data[0], zscan_data[1])      
             zscan_plot_str = '\n'.join((
-                r'eff beam height=%.2f mm' % (effective_beam_height, ),
-                r'STB=%.2f cps' % (stb, )))
+                r'eff beam height=%.3f mm' % (effective_beam_height, ),
+                r'STB=%.0f cps' % (stb, )))
             fig = Figure(figsize = (6, 4), dpi = 100)
             plot1 = fig.add_subplot(9, 1, (1,8))
             plot1.plot(zscan_data[0], zscan_data[1], label="data")
@@ -433,7 +433,7 @@ class GUI:
         fig2 = Figure(figsize=(6, 4), dpi = 100)
         plot2 = fig2.add_subplot(9, 1, (1,8))
         plot2.errorbar(spec_q, norm_reflectivity, yerr=error_bars, ecolor='red', label="data")
-        plot2.set(xlabel=r'q ($\mathrm{\AA}$)', ylabel="Reflectivity")
+        plot2.set(xlabel=r'q ($\mathrm{\AA ^{-1}}$)', ylabel="Reflectivity")
         plot2.set_title("q vs Reflectivity")
         plot2.set_yscale("log")
         handles, __ = plot2.get_legend_handles_labels()
@@ -464,8 +464,8 @@ class GUI:
         if config.xrd_no_zscan == 0:
             stb, effective_beam_height, z_1, z_2, reduced_z, inter, slope = XDAC.zscan_func(zscan_data[0], zscan_data[1])      
             zscan_plot_str = '\n'.join((
-                r'eff beam height=%.2f mm' % (effective_beam_height, ),
-                r'STB=%.2f cps' % (stb, )))
+                r'eff beam height=%.3f mm' % (effective_beam_height, ),
+                r'STB=%.0f cps' % (stb, )))
             fig = Figure(figsize = (6, 4), dpi = 100)
             plot1 = fig.add_subplot(9, 1, (1,8))
             plot1.plot(zscan_data[0], zscan_data[1], label="data")
